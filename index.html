@@ -1211,97 +1211,188 @@ function verificarRegistroActivo() {
   });
 }
 
+function crearInputFoto(idInput, idPreview, idUpload, icono, texto) {
+  var wrap = document.createElement('div');
+  wrap.className = 'foto-upload';
+  wrap.id = idUpload;
+
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.id = idInput;
+  input.accept = 'image/*';
+  input.style.cssText = 'position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0';
+
+  var icoDiv = document.createElement('div');
+  icoDiv.className = 'icono';
+  icoDiv.textContent = icono;
+
+  var p = document.createElement('p');
+  p.id = 'txt-' + idInput;
+  p.textContent = texto;
+
+  var prev = document.createElement('img');
+  prev.className = 'foto-preview';
+  prev.id = idPreview;
+
+  input.addEventListener('change', function() {
+    var file = this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      prev.src = e.target.result;
+      prev.classList.add('visible');
+      wrap.classList.add('con-foto');
+      p.textContent = '✓ Foto lista';
+      fotosData[idInput] = e.target.result;
+    };
+    reader.onerror = function() { mostrarToast('Error leyendo foto', 'error'); };
+    reader.readAsDataURL(file);
+  });
+
+  wrap.appendChild(input);
+  wrap.appendChild(icoDiv);
+  wrap.appendChild(p);
+  wrap.appendChild(prev);
+  return wrap;
+}
+
 function renderContenidoImp() {
   var cont = document.getElementById('contenido-imp');
+  cont.innerHTML = '';
+
   if (registroActivo) {
     var punto = registroActivo.punto;
-    cont.innerHTML =
-      '<div class="resumen-activa">' +
-        '<h3>⦿ Actualmente en punto</h3>' +
-        '<div class="resumen-row"><span>Tienda</span><span>' + punto.tienda + '</span></div>' +
-        '<div class="resumen-row"><span>Cadena</span><span>' + punto.cadena + '</span></div>' +
-        '<div class="resumen-row"><span>Ciudad</span><span>' + punto.ciudad + '</span></div>' +
-        '<div class="resumen-row"><span>Hora entrada</span><span>' + registroActivo.horaEntrada + '</span></div>' +
-        '<div class="resumen-row"><span>Estado exhibición</span><span>' + (registroActivo.estadoExhibicion || '—') + '</span></div>' +
-      '</div>' +
-      '<div class="form-section">' +
-        '<h3>📸 Registro de Salida</h3>' +
-        '<div class="campo"><label>Foto de ti (al salir)</label>' +
-          '<div class="foto-upload" id="fu-salida-imp" onclick="triggerFoto(\'foto-salida-imp\')">' +
-            '<input type="file" id="foto-salida-imp" accept="image/*" capture="user" onchange="previewFoto(this,\'prev-salida-imp\',\'fu-salida-imp\')">' +
-            '<div class="icono">🤳</div><p>Tomar foto</p>' +
-            '<img class="foto-preview" id="prev-salida-imp">' +
-          '</div>' +
-        '</div>' +
-        '<div class="campo"><label>Foto del punto (cómo lo dejas)</label>' +
-          '<div class="foto-upload" id="fu-salida-punto" onclick="triggerFoto(\'foto-salida-punto\')">' +
-            '<input type="file" id="foto-salida-punto" accept="image/*" capture="environment" onchange="previewFoto(this,\'prev-salida-punto\',\'fu-salida-punto\')">' +
-            '<div class="icono">🏪</div><p>Foto del punto</p>' +
-            '<img class="foto-preview" id="prev-salida-punto">' +
-          '</div>' +
-        '</div>' +
-        '<div class="campo"><label>Ventas del día (total)</label>' +
-          '<div class="campo-pesos"><input type="number" id="ventas-input" placeholder="0" inputmode="numeric"></div>' +
-        '</div>' +
-        '<div class="campo"><label>Producto más vendido</label>' +
-          '<input type="text" id="producto-mas-vendido" placeholder="Ej: Base líquida tono 3...">' +
-        '</div>' +
-        '<button class="btn-primary" onclick="registrarSalida()">Registrar Salida ✓</button>' +
-      '</div>';
-  } else {
-    var listaPuntos = usuarioActual.puntos.map(function(p){
-      return '<div class="punto-item" onclick="seleccionarPunto(\'' + p.id + '\')">' +
-        '<div>' +
-          '<div class="punto-nombre">' + p.tienda + '</div>' +
-          '<div style="font-size:0.75rem;color:var(--texto-suave);margin-top:2px">' + p.dias + '</div>' +
-        '</div>' +
-        '<span class="punto-cadena">' + p.ciudad + '</span>' +
-      '</div>';
-    }).join('');
 
-    cont.innerHTML =
-      '<div class="estado-card">' +
-        '<h3>Tu estado hoy</h3>' +
-        '<span class="badge-estado badge-libre"><span class="badge-dot"></span> Disponible</span>' +
-      '</div>' +
-      '<div class="form-section">' +
-        '<h3>📍 Selecciona el punto de hoy</h3>' +
-        '<div class="puntos-lista">' + listaPuntos + '</div>' +
-      '</div>' +
-      '<div id="form-entrada" style="display:none">' +
-        '<div class="form-section">' +
-          '<h3>📸 Registro de Entrada</h3>' +
-          '<div class="campo"><label>Foto de ti (al llegar)</label>' +
-            '<div class="foto-upload" id="fu-entrada-imp" onclick="triggerFoto(\'foto-entrada-imp\')">' +
-              '<input type="file" id="foto-entrada-imp" accept="image/*" capture="user" onchange="previewFoto(this,\'prev-entrada-imp\',\'fu-entrada-imp\')">' +
-              '<div class="icono">🤳</div><p>Tomar foto</p>' +
-              '<img class="foto-preview" id="prev-entrada-imp">' +
-            '</div>' +
-          '</div>' +
-          '<div class="campo"><label>Foto del punto (cómo lo encuentras)</label>' +
-            '<div class="foto-upload" id="fu-entrada-punto" onclick="triggerFoto(\'foto-entrada-punto\')">' +
-              '<input type="file" id="foto-entrada-punto" accept="image/*" capture="environment" onchange="previewFoto(this,\'prev-entrada-punto\',\'fu-entrada-punto\')">' +
-              '<div class="icono">🏪</div><p>Foto del punto</p>' +
-              '<img class="foto-preview" id="prev-entrada-punto">' +
-            '</div>' +
-          '</div>' +
-          '<div class="campo">' +
-            '<label>Estado de la exhibición al llegar</label>' +
-            '<div class="opciones-estado">' +
-              '<div class="opcion-estado bien" onclick="selEstado(this,\'Bien\')">👍 Bien</div>' +
-              '<div class="opcion-estado regular" onclick="selEstado(this,\'Regular\')">😐 Regular</div>' +
-              '<div class="opcion-estado mal" onclick="selEstado(this,\'Mal\')">👎 Mal</div>' +
-            '</div>' +
-          '</div>' +
-          '<div class="campo"><label>Productos agotados</label>' +
-            '<textarea id="agotados-input" placeholder="Escribe los productos agotados..."></textarea>' +
-          '</div>' +
-          '<div class="campo"><label>Sobrestock</label>' +
-            '<textarea id="sobrestock-input" placeholder="Escribe los productos con sobrestock..."></textarea>' +
-          '</div>' +
-          '<button class="btn-primary" onclick="registrarEntrada()">Registrar Entrada ✓</button>' +
-        '</div>' +
+    // Resumen activa
+    var resumen = document.createElement('div');
+    resumen.className = 'resumen-activa';
+    resumen.innerHTML = '<h3>⦿ Actualmente en punto</h3>' +
+      '<div class="resumen-row"><span>Tienda</span><span>' + punto.tienda + '</span></div>' +
+      '<div class="resumen-row"><span>Cadena</span><span>' + punto.cadena + '</span></div>' +
+      '<div class="resumen-row"><span>Ciudad</span><span>' + punto.ciudad + '</span></div>' +
+      '<div class="resumen-row"><span>Hora entrada</span><span>' + registroActivo.horaEntrada + '</span></div>' +
+      '<div class="resumen-row"><span>Estado exhibición</span><span>' + (registroActivo.estadoExhibicion || '—') + '</span></div>';
+    cont.appendChild(resumen);
+
+    // Form salida
+    var form = document.createElement('div');
+    form.className = 'form-section';
+    form.innerHTML = '<h3>📸 Registro de Salida</h3>';
+
+    // Foto impulsadora salida
+    var c1 = document.createElement('div'); c1.className = 'campo';
+    var l1 = document.createElement('label'); l1.textContent = 'Foto de ti (al salir)';
+    c1.appendChild(l1);
+    c1.appendChild(crearInputFoto('foto-salida-imp', 'prev-salida-imp', 'fu-salida-imp', '🤳', 'Tomar foto'));
+    form.appendChild(c1);
+
+    // Foto punto salida
+    var c2 = document.createElement('div'); c2.className = 'campo';
+    var l2 = document.createElement('label'); l2.textContent = 'Foto del punto (cómo lo dejas)';
+    c2.appendChild(l2);
+    c2.appendChild(crearInputFoto('foto-salida-punto', 'prev-salida-punto', 'fu-salida-punto', '🏪', 'Foto del punto'));
+    form.appendChild(c2);
+
+    // Ventas
+    var c3 = document.createElement('div'); c3.className = 'campo';
+    c3.innerHTML = '<label>Ventas del día (total)</label><div class="campo-pesos"><input type="number" id="ventas-input" placeholder="0" inputmode="numeric"></div>';
+    form.appendChild(c3);
+
+    // Producto más vendido
+    var c4 = document.createElement('div'); c4.className = 'campo';
+    c4.innerHTML = '<label>Producto más vendido</label><input type="text" id="producto-mas-vendido" placeholder="Ej: Base líquida tono 3...">';
+    form.appendChild(c4);
+
+    // Botón
+    var btn = document.createElement('button');
+    btn.className = 'btn-primary';
+    btn.textContent = 'Registrar Salida ✓';
+    btn.onclick = registrarSalida;
+    form.appendChild(btn);
+
+    cont.appendChild(form);
+
+  } else {
+    // Lista de puntos
+    var estadoCard = document.createElement('div');
+    estadoCard.className = 'estado-card';
+    estadoCard.innerHTML = '<h3>Tu estado hoy</h3><span class="badge-estado badge-libre"><span class="badge-dot"></span> Disponible</span>';
+    cont.appendChild(estadoCard);
+
+    var secPuntos = document.createElement('div');
+    secPuntos.className = 'form-section';
+    secPuntos.innerHTML = '<h3>📍 Selecciona el punto de hoy</h3>';
+    var lista = document.createElement('div');
+    lista.className = 'puntos-lista';
+    usuarioActual.puntos.forEach(function(p) {
+      var item = document.createElement('div');
+      item.className = 'punto-item';
+      item.innerHTML = '<div><div class="punto-nombre">' + p.tienda + '</div><div style="font-size:0.75rem;color:var(--texto-suave);margin-top:2px">' + p.dias + '</div></div><span class="punto-cadena">' + p.ciudad + '</span>';
+      item.addEventListener('click', function() {
+        puntoSeleccionado = p;
+        document.querySelectorAll('.punto-item').forEach(function(el){ el.classList.remove('seleccionado'); });
+        item.classList.add('seleccionado');
+        var fe = document.getElementById('form-entrada');
+        fe.style.display = '';
+        fe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      lista.appendChild(item);
+    });
+    secPuntos.appendChild(lista);
+    cont.appendChild(secPuntos);
+
+    // Form entrada (oculto inicialmente)
+    var formEntrada = document.createElement('div');
+    formEntrada.id = 'form-entrada';
+    formEntrada.style.display = 'none';
+
+    var secEntrada = document.createElement('div');
+    secEntrada.className = 'form-section';
+    secEntrada.innerHTML = '<h3>📸 Registro de Entrada</h3>';
+
+    // Foto impulsadora entrada
+    var e1 = document.createElement('div'); e1.className = 'campo';
+    var el1 = document.createElement('label'); el1.textContent = 'Foto de ti (al llegar)';
+    e1.appendChild(el1);
+    e1.appendChild(crearInputFoto('foto-entrada-imp', 'prev-entrada-imp', 'fu-entrada-imp', '🤳', 'Tomar foto'));
+    secEntrada.appendChild(e1);
+
+    // Foto punto entrada
+    var e2 = document.createElement('div'); e2.className = 'campo';
+    var el2 = document.createElement('label'); el2.textContent = 'Foto del punto (cómo lo encuentras)';
+    e2.appendChild(el2);
+    e2.appendChild(crearInputFoto('foto-entrada-punto', 'prev-entrada-punto', 'fu-entrada-punto', '🏪', 'Foto del punto'));
+    secEntrada.appendChild(e2);
+
+    // Estado exhibición
+    var e3 = document.createElement('div'); e3.className = 'campo';
+    e3.innerHTML = '<label>Estado de la exhibición al llegar</label>' +
+      '<div class="opciones-estado">' +
+        '<div class="opcion-estado bien" onclick="selEstado(this,\'Bien\')">👍 Bien</div>' +
+        '<div class="opcion-estado regular" onclick="selEstado(this,\'Regular\')">😐 Regular</div>' +
+        '<div class="opcion-estado mal" onclick="selEstado(this,\'Mal\')">👎 Mal</div>' +
       '</div>';
+    secEntrada.appendChild(e3);
+
+    // Agotados
+    var e4 = document.createElement('div'); e4.className = 'campo';
+    e4.innerHTML = '<label>Productos agotados</label><textarea id="agotados-input" placeholder="Escribe los productos agotados..."></textarea>';
+    secEntrada.appendChild(e4);
+
+    // Sobrestock
+    var e5 = document.createElement('div'); e5.className = 'campo';
+    e5.innerHTML = '<label>Sobrestock</label><textarea id="sobrestock-input" placeholder="Escribe los productos con sobrestock..."></textarea>';
+    secEntrada.appendChild(e5);
+
+    // Botón entrada
+    var btnEntrada = document.createElement('button');
+    btnEntrada.className = 'btn-primary';
+    btnEntrada.textContent = 'Registrar Entrada ✓';
+    btnEntrada.onclick = registrarEntrada;
+    secEntrada.appendChild(btnEntrada);
+
+    formEntrada.appendChild(secEntrada);
+    cont.appendChild(formEntrada);
   }
 }
 
@@ -1320,27 +1411,6 @@ function selEstado(el, val) {
   el.classList.add('sel');
 }
 
-function triggerFoto(id) {
-  document.getElementById(id).click();
-}
-
-// Lee foto como base64 simple, sin compresión
-function previewFoto(input, prevId, uploadId) {
-  var file = input.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      var prev = document.getElementById(prevId);
-      if (prev) { prev.src = e.target.result; prev.classList.add('visible'); }
-      var up = document.getElementById(uploadId);
-      if (up) up.classList.add('con-foto');
-      fotosData[input.id] = e.target.result;
-    } catch(err) { console.error('previewFoto error:', err); }
-  };
-  reader.onerror = function() { mostrarToast('Error al leer la foto', 'error'); };
-  reader.readAsDataURL(file);
-}
 
 // Comprime foto a max 400px, 40% calidad (~30-60KB)
 function comprimirFoto(base64) {
@@ -1639,7 +1709,9 @@ function cargarHistorial() {
       lista.innerHTML = '<div class="empty-state"><div class="icono">📭</div><p>Sin registros para esta fecha</p></div>';
       return;
     }
-    var registros = Object.values(snap.val());
+  window._fotosHistorial = {};
+
+  var registros = Object.values(snap.val());
     if (impFiltro) registros = registros.filter(function(r){ return r.nombre === impFiltro; });
     if (ciudadFiltro) registros = registros.filter(function(r){ return r.punto && r.punto.ciudad === ciudadFiltro; });
     registros.sort(function(a,b){ return b.tsEntrada - a.tsEntrada; });
@@ -1655,16 +1727,17 @@ function cargarHistorial() {
         ? '<span class="completado-badge">✓ Completo</span>'
         : '<span class="pendiente-badge">⦿ En punto</span>';
 
-      var fotos = [
-        { url: r.fotoImpEntrada, label: '🤳' },
-        { url: r.fotoPuntoEntrada, label: '🏪' },
-        { url: r.fotoImpSalida, label: '👋' },
-        { url: r.fotoPuntoSalida, label: '🏁' }
-      ];
-      var fotosHtml = fotos.map(function(f){
-        return f.url
-          ? '<img class="foto-thumb" src="' + f.url + '" onclick="abrirFoto(\'' + f.url + '\')">'
-          : '<div class="foto-placeholder">' + f.label + '</div>';
+      // Guardar fotos en memoria para modal
+      var fotosList = [r.fotoImpEntrada, r.fotoPuntoEntrada, r.fotoImpSalida, r.fotoPuntoSalida];
+      var regIdx = registros.indexOf(r);
+      window._fotosHistorial = window._fotosHistorial || {};
+      window._fotosHistorial[regIdx] = fotosList;
+
+      var fotosLabels = ['🤳','🏪','👋','🏁'];
+      var fotosHtml = fotosList.map(function(url, fi){
+        return (url && url.length > 10)
+          ? '<img class="foto-thumb" src="' + url + '" onclick="abrirFotoIdx(' + regIdx + ',' + fi + ')" loading="lazy">'
+          : '<div class="foto-placeholder">' + fotosLabels[fi] + '</div>';
       }).join('');
 
       var extras = '';
@@ -1694,8 +1767,14 @@ function cargarHistorial() {
 }
 
 function abrirFoto(url) {
+  if (!url || url.length < 10) return;
   document.getElementById('modal-img').src = url;
   document.getElementById('modal-foto').classList.add('abierto');
+}
+function abrirFotoIdx(regIdx, fi) {
+  var fotos = window._fotosHistorial && window._fotosHistorial[regIdx];
+  if (!fotos || !fotos[fi]) return;
+  abrirFoto(fotos[fi]);
 }
 function cerrarModal() {
   document.getElementById('modal-foto').classList.remove('abierto');
