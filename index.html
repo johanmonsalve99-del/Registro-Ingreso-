@@ -1324,49 +1324,50 @@ function triggerFoto(id) {
   document.getElementById(id).click();
 }
 
+// Lee foto como base64 simple, sin compresión
 function previewFoto(input, prevId, uploadId) {
   var file = input.files[0];
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    var prev = document.getElementById(prevId);
-    prev.src = e.target.result;
-    prev.classList.add('visible');
-    document.getElementById(uploadId).classList.add('con-foto');
-    fotosData[input.id] = e.target.result;
+    try {
+      var prev = document.getElementById(prevId);
+      if (prev) { prev.src = e.target.result; prev.classList.add('visible'); }
+      var up = document.getElementById(uploadId);
+      if (up) up.classList.add('con-foto');
+      fotosData[input.id] = e.target.result;
+    } catch(err) { console.error('previewFoto error:', err); }
   };
+  reader.onerror = function() { mostrarToast('Error al leer la foto', 'error'); };
   reader.readAsDataURL(file);
 }
 
-// Comprime imagen y retorna base64 reducido (~100KB max)
+// Comprime foto con canvas (max 600px, 50% calidad)
 function comprimirFoto(base64) {
   return new Promise(function(resolve) {
     if (!base64) { resolve(null); return; }
-    var img = new Image();
-    img.onload = function() {
-      var canvas = document.createElement('canvas');
-      var MAX = 800;
-      var w = img.width, h = img.height;
-      if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
-      else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.6));
-    };
-    img.onerror = function() { resolve(base64); };
-    img.src = base64;
+    try {
+      var img = new Image();
+      img.onload = function() {
+        try {
+          var MAX = 600;
+          var w = img.width, h = img.height;
+          if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+          else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.5));
+        } catch(e) { resolve(null); }
+      };
+      img.onerror = function() { resolve(null); };
+      img.src = base64;
+    } catch(e) { resolve(null); }
   });
-}
-
-function subirFoto(base64) {
-  // Comprime y retorna la imagen lista (no sube a ningún servidor)
-  return comprimirFoto(base64);
 }
 
 function registrarEntrada() {
   if (!puntoSeleccionado) { mostrarToast('Selecciona un punto primero', 'error'); return; }
-  if (!fotosData['foto-entrada-imp']) { mostrarToast('Falta tu foto de entrada', 'error'); return; }
-  if (!fotosData['foto-entrada-punto']) { mostrarToast('Falta la foto del punto', 'error'); return; }
   if (!estadoExhibicion) { mostrarToast('Selecciona el estado de la exhibición', 'error'); return; }
 
   var btn = document.querySelector('#form-entrada .btn-primary');
@@ -1374,9 +1375,10 @@ function registrarEntrada() {
 
   var ts = Date.now();
 
+  // Comprimir fotos (pueden ser null si no se tomaron)
   Promise.all([
-    subirFoto(fotosData['foto-entrada-imp']),
-    subirFoto(fotosData['foto-entrada-punto'])
+    comprimirFoto(fotosData['foto-entrada-imp'] || null),
+    comprimirFoto(fotosData['foto-entrada-punto'] || null)
   ]).then(function(urls) {
     var registro = {
       cedula: usuarioActual.cedula,
@@ -1389,8 +1391,8 @@ function registrarEntrada() {
       estadoExhibicion: estadoExhibicion,
       agotados: document.getElementById('agotados-input').value.trim(),
       sobrestock: document.getElementById('sobrestock-input').value.trim(),
-      fotoImpEntrada: urls[0],
-      fotoPuntoEntrada: urls[1],
+      fotoImpEntrada: urls[0] || '',
+      fotoPuntoEntrada: urls[1] || '',
       completado: false
     };
     var newRef = db.ref('sammy/historial/' + hoy()).push();
@@ -1405,24 +1407,21 @@ function registrarEntrada() {
     mostrarToast('¡Entrada registrada! ✓', 'exito');
     renderContenidoImp();
   }).catch(function(e) {
-    console.error(e);
-    mostrarToast('Error al guardar. Intenta de nuevo.', 'error');
+    console.error('registrarEntrada error:', e);
+    mostrarToast('Error al guardar: ' + e.message, 'error');
     btn.disabled = false; btn.textContent = 'Registrar Entrada ✓';
   });
 }
 
 function registrarSalida() {
-  if (!fotosData['foto-salida-imp']) { mostrarToast('Falta tu foto de salida', 'error'); return; }
-  if (!fotosData['foto-salida-punto']) { mostrarToast('Falta la foto del punto al salir', 'error'); return; }
-
   var btn = document.querySelector('#contenido-imp .btn-primary');
   btn.disabled = true; btn.textContent = 'Guardando...';
 
   var ts = Date.now();
 
   Promise.all([
-    subirFoto(fotosData['foto-salida-imp']),
-    subirFoto(fotosData['foto-salida-punto'])
+    comprimirFoto(fotosData['foto-salida-imp'] || null),
+    comprimirFoto(fotosData['foto-salida-punto'] || null)
   ]).then(function(urls) {
     var rid = registroActivo.registroId;
     var actualizacion = {
@@ -1430,8 +1429,8 @@ function registrarSalida() {
       tsSalida: ts,
       ventas: document.getElementById('ventas-input').value || 0,
       productoMasVendido: document.getElementById('producto-mas-vendido').value.trim(),
-      fotoImpSalida: urls[0],
-      fotoPuntoSalida: urls[1],
+      fotoImpSalida: urls[0] || '',
+      fotoPuntoSalida: urls[1] || '',
       completado: true
     };
     return Promise.all([
@@ -1443,8 +1442,8 @@ function registrarSalida() {
     mostrarToast('¡Salida registrada! Hasta mañana 🌸', 'exito');
     setTimeout(function(){ renderContenidoImp(); }, 1500);
   }).catch(function(e) {
-    console.error(e);
-    mostrarToast('Error al guardar. Intenta de nuevo.', 'error');
+    console.error('registrarSalida error:', e);
+    mostrarToast('Error al guardar: ' + e.message, 'error');
     btn.disabled = false; btn.textContent = 'Registrar Salida ✓';
   });
 }
