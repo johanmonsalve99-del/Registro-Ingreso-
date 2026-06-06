@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SAMMY — Registro de Impulsadoras</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rosa: #E8547A;
+  --rosa-claro: #F7A8BB;
+  --rosa-oscuro: #C0395C;
+  --crema: #FDF6F0;
+  --crema2: #FAE8E0;
+  --dorado: #C9965A;
+  --texto: #2A1A1F;
+  --texto-suave: #7A5460;
+  --blanco: #FFFFFF;
+  --verde: #4CAF82;
+  --naranja: #E8854A;
+  --rojo: #D94040;
+  --sombra: 0 4px 24px rgba(232,84,122,0.12);
+  --sombra2: 0 2px 12px rgba(42,26,31,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--crema);
+  color: var(--texto);
+  min-height: 100vh;
+}
+
+/* ===================== PANTALLAS ===================== */
+.pantalla { display: none; min-height: 100vh; }
+.pantalla.activa { display: flex; flex-direction: column; }
+
+/* ===================== HEADER ===================== */
+.header {
+  background: var(--blanco);
+  border-bottom: 2px solid var(--crema2);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(232,84,122,0.08);
+}
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--rosa);
+  letter-spacing: 3px;
+  font-weight: 700;
+}
+.logo span { color: var(--dorado); }
+.btn-salir {
+  background: none;
+  border: 1.5px solid var(--rosa-claro);
+  color: var(--rosa);
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.btn-salir:hover { background: var(--rosa); color: white; }
+
+/* ===================== LOGIN ===================== */
+#pantalla-login {
+  background: linear-gradient(135deg, #FDF6F0 0%, #FAE8E0 50%, #F7C5D0 100%);
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.login-box {
+  background: white;
+  border-radius: 24px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(232,84,122,0.18);
+  text-align: center;
+}
+.login-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  color: var(--rosa);
+  letter-spacing: 6px;
+  margin-bottom: 4px;
+}
+.login-logo span { color: var(--dorado); }
+.login-sub {
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  margin-bottom: 32px;
+  letter-spacing: 1px;
+}
+.login-tabs {
+  display: flex;
+  background: var(--crema2);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 28px;
+  gap: 4px;
+}
+.login-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+  transition: all 0.2s;
+}
+.login-tab.activo {
+  background: white;
+  color: var(--rosa);
+  box-shadow: 0 2px 8px rgba(232,84,122,0.15);
+}
+.campo {
+  margin-bottom: 16px;
+  text-align: left;
+}
+.campo label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.campo input, .campo select, .campo textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--crema2);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: var(--texto);
+  background: var(--crema);
+  transition: border-color 0.2s;
+  outline: none;
+}
+.campo input:focus, .campo select:focus, .campo textarea:focus {
+  border-color: var(--rosa-claro);
+  background: white;
+}
+.campo textarea { resize: none; height: 80px; }
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--rosa) 0%, var(--rosa-oscuro) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,84,122,0.35); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.error-msg {
+  background: #FEE;
+  color: var(--rojo);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-top: 12px;
+  display: none;
+}
+.error-msg.visible { display: block; }
+
+/* ===================== PANEL IMPULSADORA ===================== */
+#pantalla-impulsadora { background: var(--crema); }
+
+.bienvenida-card {
+  background: linear-gradient(135deg, var(--rosa) 0%, var(--rosa-oscuro) 100%);
+  color: white;
+  padding: 24px 20px;
+  text-align: center;
+}
+.bienvenida-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+.bienvenida-card p { font-size: 0.85rem; opacity: 0.85; }
+
+.contenido-imp { padding: 20px; max-width: 500px; margin: 0 auto; }
+
+.estado-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--sombra2);
+}
+.estado-card h3 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--texto-suave);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.puntos-lista { display: flex; flex-direction: column; gap: 8px; }
+.punto-item {
+  border: 1.5px solid var(--crema2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.punto-item:hover { border-color: var(--rosa-claro); background: #FFF5F7; }
+.punto-item.seleccionado { border-color: var(--rosa); background: #FFF5F7; }
+.punto-nombre { font-weight: 500; font-size: 0.92rem; }
+.punto-cadena {
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+  background: var(--crema2);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.badge-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.badge-libre { background: #E8F5EE; color: var(--verde); }
+.badge-activa { background: #FFF0F3; color: var(--rosa); }
+.badge-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulso 1.5s infinite;
+}
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ===================== FORMULARIO REGISTRO ===================== */
+.form-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--sombra2);
+}
+.form-section h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--rosa);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--crema2);
+}
+
+.foto-upload {
+  border: 2px dashed var(--rosa-claro);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.foto-upload:hover { border-color: var(--rosa); background: #FFF5F7; }
+.foto-upload input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0;
+}
+.foto-upload .icono { font-size: 2rem; margin-bottom: 6px; }
+.foto-upload p { font-size: 0.82rem; color: var(--texto-suave); }
+.foto-upload.con-foto { border-style: solid; border-color: var(--verde); }
+.foto-preview {
+  width: 100%; max-height: 180px; object-fit: cover;
+  border-radius: 8px; margin-top: 8px; display: none;
+}
+.foto-preview.visible { display: block; }
+
+.opciones-estado {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.opcion-estado {
+  flex: 1;
+  padding: 10px 6px;
+  border: 1.5px solid var(--crema2);
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: var(--texto-suave);
+}
+.opcion-estado.bien.sel { border-color: var(--verde); background: #E8F5EE; color: var(--verde); }
+.opcion-estado.regular.sel { border-color: var(--naranja); background: #FFF3EA; color: var(--naranja); }
+.opcion-estado.mal.sel { border-color: var(--rojo); background: #FEE; color: var(--rojo); }
+
+.campo-pesos { position: relative; }
+.campo-pesos input { padding-left: 40px; }
+.campo-pesos::before {
+  content: '$';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--texto-suave);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* ===================== RESUMEN ACTIVA ===================== */
+.resumen-activa {
+  background: linear-gradient(135deg, #E8F5EE, #D4EDDA);
+  border: 1.5px solid var(--verde);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.resumen-activa h3 {
+  color: var(--verde);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.resumen-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+  color: var(--texto);
+}
+.resumen-row span:first-child { color: var(--texto-suave); }
+.resumen-row span:last-child { font-weight: 600; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--rosa);
+  border: 2px solid var(--rosa);
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { background: var(--rosa); color: white; }
+
+/* ===================== PANEL ADMIN ===================== */
+#pantalla-admin { background: var(--crema); }
+
+.admin-header {
+  background: linear-gradient(135deg, #2A1A1F 0%, #4A2030 100%);
+  color: white;
+  padding: 20px;
+}
+.admin-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+}
+.admin-header p { font-size: 0.82rem; opacity: 0.7; }
+
+.admin-tabs {
+  background: white;
+  display: flex;
+  border-bottom: 2px solid var(--crema2);
+  overflow-x: auto;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.admin-tab {
+  padding: 14px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+  white-space: nowrap;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.admin-tab.activo { color: var(--rosa); border-bottom-color: var(--rosa); }
+
+.admin-contenido { padding: 20px; }
+
+/* TIEMPO REAL */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: white;
+  border-radius: 14px;
+  padding: 14px 12px;
+  text-align: center;
+  box-shadow: var(--sombra2);
+}
+.stat-numero {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--rosa);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label { font-size: 0.72rem; color: var(--texto-suave); font-weight: 500; }
+
+.impulsadoras-grid { display: flex; flex-direction: column; gap: 10px; }
+.imp-card {
+  background: white;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: var(--sombra2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 4px solid var(--crema2);
+  transition: all 0.3s;
+}
+.imp-card.en-punto { border-left-color: var(--verde); }
+.imp-card.libre { border-left-color: var(--crema2); }
+.imp-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rosa-claro), var(--rosa));
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.imp-info { flex: 1; min-width: 0; }
+.imp-nombre { font-weight: 600; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.imp-detalle { font-size: 0.78rem; color: var(--texto-suave); margin-top: 2px; }
+.imp-tiempo { font-size: 0.78rem; color: var(--verde); font-weight: 600; }
+
+/* HISTORIAL */
+.filtros {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--sombra2);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.filtros select, .filtros input {
+  padding: 10px 12px;
+  border: 1.5px solid var(--crema2);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: var(--texto);
+  background: var(--crema);
+  outline: none;
+  width: 100%;
+}
+.filtros select:focus, .filtros input:focus { border-color: var(--rosa-claro); }
+
+.registro-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--sombra2);
+}
+.reg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.reg-nombre { font-weight: 700; font-size: 0.95rem; }
+.reg-fecha { font-size: 0.75rem; color: var(--texto-suave); margin-top: 2px; }
+.reg-punto {
+  font-size: 0.75rem;
+  background: var(--crema2);
+  color: var(--texto-suave);
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.reg-datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.reg-dato {
+  font-size: 0.8rem;
+}
+.reg-dato-label { color: var(--texto-suave); margin-bottom: 2px; }
+.reg-dato-val { font-weight: 600; color: var(--texto); }
+.reg-dato-val.verde { color: var(--verde); }
+.reg-dato-val.naranja { color: var(--naranja); }
+.reg-dato-val.rojo { color: var(--rojo); }
+
+.fotos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+.foto-thumb {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+}
+.foto-thumb:hover { transform: scale(1.05); }
+.foto-placeholder {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  background: var(--crema2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--texto-suave);
+}
+
+.reg-notas { font-size: 0.8rem; color: var(--texto-suave); font-style: italic; margin-top: 6px; }
+
+/* MODAL FOTO */
+.modal-foto {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-foto.abierto { display: flex; }
+.modal-foto img {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 12px;
+  object-fit: contain;
+}
+.modal-cerrar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LOADING */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  gap: 10px;
+}
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--crema2);
+  border-top-color: var(--rosa);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--texto-suave);
+}
+.empty-state .icono { font-size: 2.5rem; margin-bottom: 10px; }
+.empty-state p { font-size: 0.88rem; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--texto);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  z-index: 2000;
+  transition: transform 0.3s;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.visible { transform: translateX(-50%) translateY(0); }
+.toast.exito { background: var(--verde); }
+.toast.error { background: var(--rojo); }
+
+/* Separador visual en registro completado */
+.completado-badge {
+  background: #E8F5EE;
+  border: 1px solid var(--verde);
+  color: var(--verde);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.pendiente-badge {
+  background: #FFF3EA;
+  border: 1px solid var(--naranja);
+  color: var(--naranja);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+@media (max-width: 360px) {
+  .login-box { padding: 28px 20px; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .fotos-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== PANTALLA LOGIN ===== -->
+<div id="pantalla-login" class="pantalla activa">
+  <div class="login-box">
+    <div class="login-logo">SAMMY<span>.</span></div>
+    <div class="login-sub">REGISTRO DE IMPULSADORAS</div>
+
+    <div class="login-tabs">
+      <button class="login-tab activo" onclick="cambiarTab('impulsadora')">Soy Impulsadora</button>
+      <button class="login-tab" onclick="cambiarTab('admin')">Administración</button>
+    </div>
+
+    <!-- TAB IMPULSADORA -->
+    <div id="tab-impulsadora">
+      <div class="campo">
+        <label>Número de Cédula</label>
+        <input type="number" id="cedula-input" placeholder="Ej: 1001505950" inputmode="numeric">
+      </div>
+      <button class="btn-primary" onclick="loginImpulsadora()">Ingresar →</button>
+    </div>
+
+    <!-- TAB ADMIN -->
+    <div id="tab-admin" style="display:none">
+      <div class="campo">
+        <label>Contraseña</label>
+        <input type="password" id="admin-pass" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" onclick="loginAdmin()">Acceder →</button>
+    </div>
+
+    <div class="error-msg" id="error-login">Cédula no encontrada. Verifica e intenta de nuevo.</div>
+  </div>
+</div>
+
+<!-- ===== PANTALLA IMPULSADORA ===== -->
+<div id="pantalla-impulsadora" class="pantalla">
+  <div class="header">
+    <div class="logo">SAMMY<span>.</span></div>
+    <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+  </div>
+
+  <div class="bienvenida-card">
+    <h2 id="imp-saludo">¡Hola!</h2>
+    <p id="imp-fecha"></p>
+  </div>
+
+  <div class="contenido-imp" id="contenido-imp">
+    <!-- Se renderiza dinámicamente -->
+  </div>
+</div>
+
+<!-- ===== PANTALLA ADMIN ===== -->
+<div id="pantalla-admin" class="pantalla">
+  <div class="header">
+    <div class="logo">SAMMY<span>.</span></div>
+    <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+  </div>
+
+  <div class="admin-header">
+    <h2>Panel Administrativo</h2>
+    <p id="admin-fecha-hora"></p>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab activo" onclick="adminTab('tiempo-real')">⦿ Tiempo Real</button>
+    <button class="admin-tab" onclick="adminTab('historial')">Historial</button>
+  </div>
+
+  <div class="admin-contenido">
+    <!-- TIEMPO REAL -->
+    <div id="admin-tiempo-real">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-numero" id="stat-activas">0</div>
+          <div class="stat-label">Activas hoy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-numero" id="stat-en-punto">0</div>
+          <div class="stat-label">En punto</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-numero" id="stat-total">18</div>
+          <div class="stat-label">Total</div>
+        </div>
+      </div>
+      <div class="impulsadoras-grid" id="lista-tiempo-real">
+        <div class="loading"><div class="spinner"></div> Cargando...</div>
+      </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div id="admin-historial" style="display:none">
+      <div class="filtros">
+        <input type="date" id="filtro-fecha" onchange="cargarHistorial()">
+        <select id="filtro-imp" onchange="cargarHistorial()">
+          <option value="">Todas las impulsadoras</option>
+        </select>
+        <select id="filtro-ciudad" onchange="cargarHistorial()" style="grid-column: span 2">
+          <option value="">Todas las ciudades</option>
+          <option>MEDELLIN</option>
+          <option>BOGOTA</option>
+          <option>CALI</option>
+          <option>BARRANQUILLA</option>
+          <option>CARTAGENA</option>
+          <option>BUCARAMANGA</option>
+          <option>SANTA MARTA</option>
+          <option>NEIVA</option>
+          <option>VILLAVICENCIO</option>
+          <option>CHIA</option>
+          <option>CUCUTA</option>
+          <option>IBAGUE</option>
+          <option>MONTERIA</option>
+          <option>BARRANCABERMEJA</option>
+        </select>
+      </div>
+      <div id="lista-historial">
+        <div class="loading"><div class="spinner"></div> Cargando...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FOTO -->
+<div class="modal-foto" id="modal-foto" onclick="cerrarModal()">
+  <button class="modal-cerrar" onclick="cerrarModal()">✕</button>
+  <img id="modal-img" src="" alt="Foto">
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getStorage, ref as sref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCYcoZ_0mcYV8DD72nc2OxnIcmnKcP0irw",
+  authDomain: "registro-de-ingreso-sammy.firebaseapp.com",
+  databaseURL: "https://registro-de-ingreso-sammy-default-rtdb.firebaseio.com",
+  projectId: "registro-de-ingreso-sammy",
+  storageBucket: "registro-de-ingreso-sammy.firebasestorage.app",
+  messagingSenderId: "265642944973",
+  appId: "1:265642944973:web:65014cafe0d6b29884fc84"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const storage = getStorage(app);
+
+// ===== DATOS IMPULSADORAS =====
+const IMPULSADORAS = {
+  "1001505950": { nombre: "Laura Cristina Rave", tel: "3016994409", ciudad: "MEDELLIN", puntos: [
+    { id: "locatel-oviedo", tienda: "LOCATEL OVIEDO", cadena: "LOCATEL", ciudad: "MEDELLIN", dias: "MARTES - SABADOS" },
+    { id: "exito-poblado", tienda: "ÉXITO POBLADO", cadena: "ÉXITO", ciudad: "MEDELLIN", dias: "MARTES - SABADOS" },
+    { id: "jumbo-rionegro", tienda: "JUMBO RIONEGRO", cadena: "JUMBO", ciudad: "RIONEGRO", dias: "MIERCOLES" },
+    { id: "locatel-la-ceja", tienda: "LOCATEL LA CEJA", cadena: "LOCATEL", ciudad: "RIONEGRO", dias: "MIERCOLES" },
+    { id: "locatel-san-antonio", tienda: "LOCATEL SAN ANTONIO", cadena: "LOCATEL", ciudad: "MEDELLIN", dias: "JUEVES" },
+    { id: "exito-san-antonio", tienda: "ÉXITO SAN ANTONIO", cadena: "ÉXITO", ciudad: "MEDELLIN", dias: "JUEVES" },
+    { id: "exito-rionegro", tienda: "ÉXITO RIONEGRO", cadena: "ÉXITO", ciudad: "RIONEGRO", dias: "VIERNES" }
+  ]},
+  "43757628": { nombre: "Martha Lucia Avendaño", tel: "3043428475", ciudad: "MEDELLIN", puntos: [
+    { id: "exito-mayorca", tienda: "ÉXITO MAYORCA", cadena: "ÉXITO", ciudad: "MEDELLIN", dias: "MARTES - JUEVES" },
+    { id: "exito-envigado", tienda: "ÉXITO ENVIGADO", cadena: "ÉXITO", ciudad: "MEDELLIN", dias: "MARTES - SABADO" },
+    { id: "falabella-arkadia", tienda: "FALABELLA ARKADIA", cadena: "FALABELLA", ciudad: "MEDELLIN", dias: "MIERCOLES - VIERNES" },
+    { id: "exito-sabaneta", tienda: "ÉXITO SABANETA", cadena: "ÉXITO", ciudad: "MEDELLIN", dias: "JUEVES" },
+    { id: "locatel-envigado", tienda: "LOCATEL ENVIGADO", cadena: "LOCATEL", ciudad: "MEDELLIN", dias: "SABADO" }
+  ]},
+  "1007652640": { nombre: "Yesica Jimenez", tel: "3116028767", ciudad: "MEDELLIN", puntos: [
+    { id: "jumbo-la65", tienda: "JUMBO LA 65", cadena: "JUMBO", ciudad: "MEDELLIN", dias: "MARTES" },
+    { id: "exito-laureles", tienda: "ÉXITO LAURELES", cadena: "ÉXITO", ciudad: "MEDELLIN", dias: "MARTES" },
+    { id: "exito-robledo", tienda: "ÉXITO ROBLEDO", cadena: "ÉXITO", ciudad: "MEDELLIN", dias: "MIERCOLES - VIERNES" },
+    { id: "exito-colombia", tienda: "ÉXITO COLOMBIA", cadena: "ÉXITO", ciudad: "MEDELLIN", dias: "MIERCOLES - VIERNES" },
+    { id: "jumbo-las-vegas", tienda: "JUMBO LAS VEGAS", cadena: "JUMBO", ciudad: "MEDELLIN", dias: "JUEVES" },
+    { id: "locatel-city-plaza", tienda: "LOCATEL CITY PLAZA", cadena: "LOCATEL", ciudad: "MEDELLIN", dias: "JUEVES" },
+    { id: "locatel-laureles", tienda: "LOCATEL LAURELES", cadena: "LOCATEL", ciudad: "MEDELLIN", dias: "SABADO" }
+  ]},
+  "1006073354": { nombre: "Paula Andrea Urbano", tel: "3154034909", ciudad: "CALI", puntos: [
+    { id: "jumbo-valle-lili", tienda: "JUMBO VALLE DEL LILI", cadena: "JUMBO", ciudad: "CALI", dias: "MARTES" },
+    { id: "exito-valle-lili", tienda: "ÉXITO VALLE DEL LILI", cadena: "ÉXITO", ciudad: "CALI", dias: "MARTES - VIERNES" },
+    { id: "exito-san-fernando", tienda: "ÉXITO SAN FERNANDO", cadena: "ÉXITO", ciudad: "CALI", dias: "MIERCOLES" },
+    { id: "exito-unicali", tienda: "ÉXITO UNICALI", cadena: "ÉXITO", ciudad: "CALI", dias: "JUEVES - SABADO" },
+    { id: "lamontana-pasoancho", tienda: "LA MONTAÑA PASOANCHO", cadena: "LA MONTAÑA", ciudad: "CALI", dias: "JUEVES" }
+  ]},
+  "66913275": { nombre: "Elizabeth Cardenas", tel: "3058179503", ciudad: "CALI", puntos: [
+    { id: "exito-chipichape", tienda: "ÉXITO CHIPICHAPE", cadena: "ÉXITO", ciudad: "CALI", dias: "MARTES - SABADO" },
+    { id: "lamontana-calima", tienda: "LA MONTAÑA CALIMA", cadena: "LA MONTAÑA", ciudad: "CALI", dias: "MIERCOLES" },
+    { id: "exito-la-flora", tienda: "ÉXITO LA FLORA", cadena: "ÉXITO", ciudad: "CALI", dias: "MIERCOLES" },
+    { id: "exito-jamundi", tienda: "ÉXITO JAMUNDÍ", cadena: "ÉXITO", ciudad: "CALI", dias: "JUEVES" },
+    { id: "lamontana-av-sexta", tienda: "LA MONTAÑA AV. SEXTA", cadena: "LA MONTAÑA", ciudad: "CALI", dias: "VIERNES" },
+    { id: "lamontana-cosmocentro", tienda: "LA MONTAÑA COSMOCENTRO", cadena: "LA MONTAÑA", ciudad: "CALI", dias: "VIERNES" }
+  ]},
+  "1001885296": { nombre: "Gilary Andrea Palacios", tel: "3014606547", ciudad: "BARRANQUILLA", puntos: [
+    { id: "jumbo-altos-prado", tienda: "JUMBO ALTOS DEL PRADO", cadena: "JUMBO", ciudad: "BARRANQUILLA", dias: "MARTES" },
+    { id: "exito-buenavista-blla", tienda: "ÉXITO BUENAVISTA", cadena: "ÉXITO", ciudad: "BARRANQUILLA", dias: "MARTES - SABADO" },
+    { id: "exito-barranquilla", tienda: "ÉXITO BARRANQUILLA", cadena: "ÉXITO", ciudad: "BARRANQUILLA", dias: "MIERCOLES - VIERNES" },
+    { id: "exito-metropolitano", tienda: "ÉXITO METROPOLITANO", cadena: "ÉXITO", ciudad: "BARRANQUILLA", dias: "MIERCOLES" }
+  ]},
+  "1193561027": { nombre: "Viviana Rocio Diaz Bolaños", tel: "3103350970", ciudad: "SANTA MARTA", puntos: [
+    { id: "exito-buenavista-sm", tienda: "ÉXITO BUENAVISTA", cadena: "ÉXITO", ciudad: "SANTA MARTA", dias: "MARTES" },
+    { id: "exito-santa-marta-centro", tienda: "ÉXITO SANTA MARTA CENTRO", cadena: "ÉXITO", ciudad: "SANTA MARTA", dias: "MIERCOLES" }
+  ]},
+  "45559854": { nombre: "Jennifer Chavez Mar", tel: "3015980423", ciudad: "CARTAGENA", puntos: [
+    { id: "jumbo-caribe-plaza", tienda: "JUMBO CARIBE PLAZA", cadena: "JUMBO", ciudad: "CARTAGENA", dias: "MARTES" },
+    { id: "jumbo-castillo", tienda: "JUMBO CASTILLO", cadena: "JUMBO", ciudad: "CARTAGENA", dias: "VIERNES" },
+    { id: "locatel-cartagena", tienda: "LOCATEL CARTAGENA", cadena: "LOCATEL", ciudad: "CARTAGENA", dias: "VIERNES" }
+  ]},
+  "63533120": { nombre: "Eylen Katherine Quintero", tel: "3043342928", ciudad: "BUCARAMANGA", puntos: [
+    { id: "jumbo-cañaveral", tienda: "JUMBO CAÑAVERAL", cadena: "JUMBO", ciudad: "BUCARAMANGA", dias: "MARTES" },
+    { id: "exito-bucaramanga", tienda: "ÉXITO BUCARAMANGA", cadena: "ÉXITO", ciudad: "BUCARAMANGA", dias: "MIERCOLES - SABADO" },
+    { id: "jumbo-cabecera", tienda: "JUMBO CABECERA", cadena: "JUMBO", ciudad: "BUCARAMANGA", dias: "JUEVES" },
+    { id: "jumbo-san-silvestre", tienda: "JUMBO SAN SILVESTRE", cadena: "JUMBO", ciudad: "BARRANCABERMEJA", dias: "JUEVES - 1 VEZ AL MES" },
+    { id: "exito-florida", tienda: "ÉXITO FLORIDA", cadena: "ÉXITO", ciudad: "BUCARAMANGA", dias: "VIERNES" }
+  ]},
+  "25786410": { nombre: "Sandra Milena Negrete", tel: "3217530413", ciudad: "MONTERIA", puntos: [
+    { id: "exito-alamedas-sinu", tienda: "ÉXITO ALAMEDAS DEL SINÚ", cadena: "ÉXITO", ciudad: "MONTERIA", dias: "MIERCOLES - SABADO" }
+  ]},
+  "1075312594": { nombre: "Angie Julieth Valderra", tel: "3145412845", ciudad: "NEIVA", puntos: [
+    { id: "exito-san-pedro-neiva", tienda: "ÉXITO SAN PEDRO", cadena: "ÉXITO", ciudad: "NEIVA", dias: "MARTES - JUEVES - VIERNES - SABADO" },
+    { id: "tres-elefantes-neiva", tienda: "TRES ELEFANTES NEIVA", cadena: "TRES ELEFANTES", ciudad: "NEIVA", dias: "VIERNES" }
+  ]},
+  "40330943": { nombre: "Marisela Silva Guevara", tel: "3219644353", ciudad: "VILLAVICENCIO", puntos: [
+    { id: "exito-la-sabana", tienda: "ÉXITO LA SABANA", cadena: "ÉXITO", ciudad: "VILLAVICENCIO", dias: "MARTES - JUEVES - SABADO" }
+  ]},
+  "24042217": { nombre: "Audrey Noguera Cardenas", tel: "3244562893", ciudad: "BOGOTA", puntos: [
+    { id: "exito-country", tienda: "ÉXITO COUNTRY", cadena: "ÉXITO", ciudad: "BOGOTA", dias: "MARTES - VIERNES" },
+    { id: "exito-colina", tienda: "ÉXITO COLINA", cadena: "ÉXITO", ciudad: "BOGOTA", dias: "MARTES - SABADO" },
+    { id: "locatel-hayuelos", tienda: "LOCATEL HAYUELOS", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "MIERCOLES" },
+    { id: "falabella-hayuelos", tienda: "FALABELLA HAYUELOS", cadena: "FALABELLA", ciudad: "BOGOTA", dias: "MIERCOLES" },
+    { id: "jumbo-titan", tienda: "JUMBO TITAN", cadena: "JUMBO", ciudad: "BOGOTA", dias: "JUEVES" },
+    { id: "falabella-titan", tienda: "FALABELLA TITAN", cadena: "FALABELLA", ciudad: "BOGOTA", dias: "JUEVES" }
+  ]},
+  "45559001": { nombre: "Ximena Pulido", tel: "3135428712", ciudad: "CHIA", puntos: [
+    { id: "jumbo-chia", tienda: "JUMBO CHÍA", cadena: "JUMBO", ciudad: "CHIA", dias: "MARTES - JUEVES" },
+    { id: "exito-fontanar", tienda: "ÉXITO FONTANAR CHÍA", cadena: "ÉXITO", ciudad: "CHIA", dias: "MARTES - SABADO" },
+    { id: "tres-elefantes-chia", tienda: "TRES ELEFANTES CHÍA", cadena: "TRES ELEFANTES", ciudad: "CHIA", dias: "MARTES - JUEVES" },
+    { id: "jumbo-calle170", tienda: "JUMBO CALLE 170", cadena: "JUMBO", ciudad: "BOGOTA", dias: "MIERCOLES" },
+    { id: "jumbo-santa-ana", tienda: "JUMBO SANTA ANA", cadena: "JUMBO", ciudad: "BOGOTA", dias: "MIERCOLES" },
+    { id: "locatel-hacienda", tienda: "LOCATEL HACIENDA", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "MIERCOLES" },
+    { id: "locatel-116", tienda: "LOCATEL 116", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "MIERCOLES" },
+    { id: "locatel-chia", tienda: "LOCATEL CHÍA", cadena: "LOCATEL", ciudad: "CHIA", dias: "JUEVES" },
+    { id: "jumbo-santa-fe", tienda: "JUMBO SANTA FE", cadena: "JUMBO", ciudad: "BOGOTA", dias: "VIERNES" }
+  ]},
+  "1075543293": { nombre: "Paula Andrea Charry", tel: "3227413862", ciudad: "BOGOTA", puntos: [
+    { id: "jumbo-plaza-central", tienda: "JUMBO PLAZA CENTRAL", cadena: "JUMBO", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL)" },
+    { id: "jumbo-20-julio", tienda: "JUMBO 20 DE JULIO", cadena: "JUMBO", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL)" },
+    { id: "jumbo-autopista-sur", tienda: "JUMBO AUTOPISTA SUR", cadena: "JUMBO", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL)" },
+    { id: "locatel-paseo-villa", tienda: "LOCATEL PASEO DE VILLA DEL RIO", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL)" },
+    { id: "exito-ensueno", tienda: "ÉXITO ENSUEÑO", cadena: "ÉXITO", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL)" },
+    { id: "exito-ecoplaza", tienda: "ÉXITO ECOPLAZA MOSQUERA", cadena: "ÉXITO", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL)" },
+    { id: "jumbo-calle80", tienda: "JUMBO CALLE 80", cadena: "JUMBO", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL)" },
+    { id: "exito-calle80", tienda: "ÉXITO CALLE 80", cadena: "ÉXITO", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL)" },
+    { id: "tres-elefantes-pasadena", tienda: "TRES ELEFANTES PASADENA", cadena: "TRES ELEFANTES", ciudad: "BOGOTA", dias: "MARTES (QUINCENAL) - SABADO" },
+    { id: "jumbo-suba", tienda: "JUMBO SUBA", cadena: "JUMBO", ciudad: "BOGOTA", dias: "MIERCOLES - SABADO" },
+    { id: "falabella-suba", tienda: "FALABELLA SUBA", cadena: "FALABELLA", ciudad: "BOGOTA", dias: "MIERCOLES - SABADO" },
+    { id: "jumbo-bulevar-niza", tienda: "JUMBO BULEVAR NIZA", cadena: "JUMBO", ciudad: "BOGOTA", dias: "MIERCOLES" },
+    { id: "tres-elefantes-cedrito", tienda: "TRES ELEFANTES CEDRITO", cadena: "TRES ELEFANTES", ciudad: "BOGOTA", dias: "MIERCOLES - VIERNES" },
+    { id: "locatel-plaza-americas", tienda: "LOCATEL PLAZA DE LAS AMÉRICAS", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "JUEVES" },
+    { id: "tres-elefantes-esperanza", tienda: "TRES ELEFANTES ESPERANZA", cadena: "TRES ELEFANTES", ciudad: "BOGOTA", dias: "JUEVES" },
+    { id: "jumbo-hayuelos", tienda: "JUMBO HAYUELOS", cadena: "JUMBO", ciudad: "BOGOTA", dias: "JUEVES" },
+    { id: "locatel-salitre", tienda: "LOCATEL SALITRE", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "JUEVES" },
+    { id: "falabella-plaza-central", tienda: "FALABELLA PLAZA CENTRAL", cadena: "FALABELLA", ciudad: "BOGOTA", dias: "JUEVES" },
+    { id: "locatel-chapinero", tienda: "LOCATEL CHAPINERO", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "VIERNES" },
+    { id: "locatel-calle100", tienda: "LOCATEL CALLE 100", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "VIERNES" },
+    { id: "locatel-cedrito-cha", tienda: "LOCATEL CEDRITO", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "VIERNES" }
+  ]},
+  "1027525331": { nombre: "Laura Chichilla", tel: "3116729364", ciudad: "BOGOTA", puntos: [
+    { id: "locatel-restrepo", tienda: "LOCATEL RESTREPO", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "MARTES - JUEVES" },
+    { id: "exito-villa-mayor", tienda: "ÉXITO VILLA MAYOR", cadena: "ÉXITO", ciudad: "BOGOTA", dias: "MARTES - SABADO" },
+    { id: "locatel-galerias", tienda: "LOCATEL GALERÍAS", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "MIERCOLES" },
+    { id: "exito-floresta", tienda: "ÉXITO FLORESTA", cadena: "ÉXITO", ciudad: "BOGOTA", dias: "MIERCOLES - VIERNES" },
+    { id: "locatel-calima", tienda: "LOCATEL CALIMA", cadena: "LOCATEL", ciudad: "BOGOTA", dias: "JUEVES" }
+  ]},
+  "1090388015": { nombre: "Fanny Yasmin Echeverri", tel: "3136780511", ciudad: "CUCUTA", puntos: [
+    { id: "exito-san-mateo-cucuta", tienda: "ÉXITO SAN MATEO", cadena: "ÉXITO", ciudad: "CUCUTA", dias: "1 VEZ POR SEMANA" }
+  ]},
+  "YINA001": { nombre: "Yina Carolina", tel: "3184128877", ciudad: "IBAGUE", puntos: [
+    { id: "falabella-acqua", tienda: "FALABELLA ACQUA", cadena: "FALABELLA", ciudad: "IBAGUE", dias: "JUEVES" }
+  ]}
+};
+
+// Estado global
+let usuarioActual = null;
+let puntoSeleccionado = null;
+let registroActivo = null;
+let fotosData = {};
+let estadoExhibicion = '';
+let timerAdmin = null;
+
+// ===== UTILIDADES =====
+function hoy() {
+  return new Date().toISOString().split('T')[0];
+}
+function horaActual() {
+  return new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+}
+function fechaLegible(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' });
+}
+function mostrarToast(msg, tipo='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast visible ' + tipo;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+function formatPesos(n) {
+  if (!n) return '—';
+  return '$ ' + Number(n).toLocaleString('es-CO');
+}
+function iniciales(nombre) {
+  return nombre.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+}
+
+// ===== LOGIN =====
+window.cambiarTab = function(tab) {
+  document.querySelectorAll('.login-tab').forEach((t, i) => {
+    t.classList.toggle('activo', (tab === 'impulsadora' && i === 0) || (tab === 'admin' && i === 1));
+  });
+  document.getElementById('tab-impulsadora').style.display = tab === 'impulsadora' ? '' : 'none';
+  document.getElementById('tab-admin').style.display = tab === 'admin' ? '' : 'none';
+  document.getElementById('error-login').classList.remove('visible');
+};
+
+window.loginImpulsadora = function() {
+  const cedula = document.getElementById('cedula-input').value.trim();
+  const err = document.getElementById('error-login');
+  const imp = IMPULSADORAS[cedula];
+  if (!imp) {
+    err.textContent = 'Cédula no encontrada. Verifica e intenta de nuevo.';
+    err.classList.add('visible');
+    return;
+  }
+  err.classList.remove('visible');
+  usuarioActual = { cedula, ...imp };
+  mostrarPantallaImpulsadora();
+};
+
+window.loginAdmin = function() {
+  const pass = document.getElementById('admin-pass').value;
+  const err = document.getElementById('error-login');
+  if (pass !== 'sammy2026') {
+    err.textContent = 'Contraseña incorrecta.';
+    err.classList.add('visible');
+    return;
+  }
+  err.classList.remove('visible');
+  mostrarPantallaAdmin();
+};
+
+window.cerrarSesion = function() {
+  if (timerAdmin) clearInterval(timerAdmin);
+  usuarioActual = null; puntoSeleccionado = null; registroActivo = null; fotosData = {}; estadoExhibicion = '';
+  document.getElementById('cedula-input').value = '';
+  document.getElementById('admin-pass').value = '';
+  mostrarPantalla('login');
+};
+
+function mostrarPantalla(id) {
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  document.getElementById('pantalla-' + id).classList.add('activa');
+}
+
+// ===== PANTALLA IMPULSADORA =====
+async function mostrarPantallaImpulsadora() {
+  mostrarPantalla('impulsadora');
+  const d = new Date();
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('imp-saludo').textContent = `¡Hola, ${usuarioActual.nombre.split(' ')[0]}!`;
+  document.getElementById('imp-fecha').textContent = `${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]} de ${d.getFullYear()}`;
+
+  // Verificar si hay registro activo hoy
+  await verificarRegistroActivo();
+  renderContenidoImp();
+}
+
+async function verificarRegistroActivo() {
+  const snapRef = ref(db, `sammy/registros_activos/${usuarioActual.cedula}`);
+  const snap = await get(snapRef);
+  registroActivo = snap.exists() ? snap.val() : null;
+}
+
+function renderContenidoImp() {
+  const cont = document.getElementById('contenido-imp');
+
+  if (registroActivo) {
+    // Está en un punto → mostrar resumen y botón de salida
+    const punto = registroActivo.punto;
+    cont.innerHTML = `
+      <div class="resumen-activa">
+        <h3>⦿ Actualmente en punto</h3>
+        <div class="resumen-row"><span>Tienda</span><span>${punto.tienda}</span></div>
+        <div class="resumen-row"><span>Cadena</span><span>${punto.cadena}</span></div>
+        <div class="resumen-row"><span>Ciudad</span><span>${punto.ciudad}</span></div>
+        <div class="resumen-row"><span>Hora entrada</span><span>${registroActivo.horaEntrada}</span></div>
+        <div class="resumen-row"><span>Estado exhibición</span><span>${registroActivo.estadoExhibicion || '—'}</span></div>
+      </div>
+      <div class="form-section">
+        <h3>📸 Registro de Salida</h3>
+        <div class="campo"><label>Foto de ti (al salir)</label>
+          <div class="foto-upload" id="fu-salida-imp" onclick="triggerFoto('foto-salida-imp')">
+            <input type="file" id="foto-salida-imp" accept="image/*" capture="user" onchange="previewFoto(this,'prev-salida-imp','fu-salida-imp')">
+            <div class="icono">🤳</div><p>Tomar foto</p>
+            <img class="foto-preview" id="prev-salida-imp">
+          </div>
+        </div>
+        <div class="campo"><label>Foto del punto (cómo lo dejas)</label>
+          <div class="foto-upload" id="fu-salida-punto" onclick="triggerFoto('foto-salida-punto')">
+            <input type="file" id="foto-salida-punto" accept="image/*" capture="environment" onchange="previewFoto(this,'prev-salida-punto','fu-salida-punto')">
+            <div class="icono">🏪</div><p>Foto del punto</p>
+            <img class="foto-preview" id="prev-salida-punto">
+          </div>
+        </div>
+        <div class="campo"><label>Ventas del día (total)</label>
+          <div class="campo-pesos"><input type="number" id="ventas-input" placeholder="0" inputmode="numeric"></div>
+        </div>
+        <div class="campo"><label>Producto más vendido</label>
+          <input type="text" id="producto-mas-vendido" placeholder="Ej: Base líquida tono 3...">
+        </div>
+        <button class="btn-primary" onclick="registrarSalida()">Registrar Salida ✓</button>
+      </div>
+    `;
+  } else {
+    // No está en punto → seleccionar punto y registrar entrada
+    const listaPuntos = usuarioActual.puntos.map(p => `
+      <div class="punto-item" onclick="seleccionarPunto('${p.id}')">
+        <div>
+          <div class="punto-nombre">${p.tienda}</div>
+          <div style="font-size:0.75rem;color:var(--texto-suave);margin-top:2px">${p.dias}</div>
+        </div>
+        <span class="punto-cadena">${p.ciudad}</span>
+      </div>
+    `).join('');
+
+    cont.innerHTML = `
+      <div class="estado-card">
+        <h3>Tu estado hoy</h3>
+        <span class="badge-estado badge-libre"><span class="badge-dot"></span> Disponible</span>
+      </div>
+      <div class="form-section">
+        <h3>📍 Selecciona el punto de hoy</h3>
+        <div class="puntos-lista">${listaPuntos}</div>
+      </div>
+      <div id="form-entrada" style="display:none">
+        <div class="form-section">
+          <h3>📸 Registro de Entrada</h3>
+          <div class="campo"><label>Foto de ti (al llegar)</label>
+            <div class="foto-upload" id="fu-entrada-imp" onclick="triggerFoto('foto-entrada-imp')">
+              <input type="file" id="foto-entrada-imp" accept="image/*" capture="user" onchange="previewFoto(this,'prev-entrada-imp','fu-entrada-imp')">
+              <div class="icono">🤳</div><p>Tomar foto</p>
+              <img class="foto-preview" id="prev-entrada-imp">
+            </div>
+          </div>
+          <div class="campo"><label>Foto del punto (cómo lo encuentras)</label>
+            <div class="foto-upload" id="fu-entrada-punto" onclick="triggerFoto('foto-entrada-punto')">
+              <input type="file" id="foto-entrada-punto" accept="image/*" capture="environment" onchange="previewFoto(this,'prev-entrada-punto','fu-entrada-punto')">
+              <div class="icono">🏪</div><p>Foto del punto</p>
+              <img class="foto-preview" id="prev-entrada-punto">
+            </div>
+          </div>
+          <div class="campo">
+            <label>Estado de la exhibición al llegar</label>
+            <div class="opciones-estado">
+              <div class="opcion-estado bien" onclick="selEstado('Bien')">👍 Bien</div>
+              <div class="opcion-estado regular" onclick="selEstado('Regular')">😐 Regular</div>
+              <div class="opcion-estado mal" onclick="selEstado('Mal')">👎 Mal</div>
+            </div>
+          </div>
+          <div class="campo"><label>Productos agotados</label>
+            <textarea id="agotados-input" placeholder="Escribe los productos agotados..."></textarea>
+          </div>
+          <div class="campo"><label>Sobrestock</label>
+            <textarea id="sobrestock-input" placeholder="Escribe los productos con sobrestock..."></textarea>
+          </div>
+          <button class="btn-primary" onclick="registrarEntrada()">Registrar Entrada ✓</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+window.seleccionarPunto = function(id) {
+  puntoSeleccionado = usuarioActual.puntos.find(p => p.id === id);
+  document.querySelectorAll('.punto-item').forEach(el => el.classList.remove('seleccionado'));
+  event.currentTarget.classList.add('seleccionado');
+  document.getElementById('form-entrada').style.display = '';
+  document.getElementById('form-entrada').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+window.selEstado = function(val) {
+  estadoExhibicion = val;
+  document.querySelectorAll('.opcion-estado').forEach(el => el.classList.remove('sel'));
+  event.currentTarget.classList.add('sel');
+};
+
+window.triggerFoto = function(id) {
+  document.getElementById(id).click();
+};
+
+window.previewFoto = function(input, prevId, uploadId) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById(prevId);
+    prev.src = e.target.result;
+    prev.classList.add('visible');
+    document.getElementById(uploadId).classList.add('con-foto');
+    fotosData[input.id] = e.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+async function subirFoto(base64, ruta) {
+  if (!base64) return null;
+  try {
+    const fRef = sref(storage, ruta);
+    await uploadString(fRef, base64, 'data_url');
+    return await getDownloadURL(fRef);
+  } catch(e) {
+    console.error('Error subiendo foto:', e);
+    return null;
+  }
+}
+
+window.registrarEntrada = async function() {
+  if (!puntoSeleccionado) { mostrarToast('Selecciona un punto primero', 'error'); return; }
+  if (!fotosData['foto-entrada-imp']) { mostrarToast('Falta tu foto de entrada', 'error'); return; }
+  if (!fotosData['foto-entrada-punto']) { mostrarToast('Falta la foto del punto', 'error'); return; }
+  if (!estadoExhibicion) { mostrarToast('Selecciona el estado de la exhibición', 'error'); return; }
+
+  const btn = document.querySelector('#form-entrada .btn-primary');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  try {
+    const ts = Date.now();
+    const ruta = `sammy_fotos/${usuarioActual.cedula}/${hoy()}`;
+    const [urlImpEntrada, urlPuntoEntrada] = await Promise.all([
+      subirFoto(fotosData['foto-entrada-imp'], `${ruta}/entrada_imp_${ts}.jpg`),
+      subirFoto(fotosData['foto-entrada-punto'], `${ruta}/entrada_punto_${ts}.jpg`)
+    ]);
+
+    const registro = {
+      cedula: usuarioActual.cedula,
+      nombre: usuarioActual.nombre,
+      ciudadBase: usuarioActual.ciudad,
+      punto: puntoSeleccionado,
+      fecha: hoy(),
+      horaEntrada: horaActual(),
+      tsEntrada: ts,
+      estadoExhibicion,
+      agotados: document.getElementById('agotados-input').value.trim(),
+      sobrestock: document.getElementById('sobrestock-input').value.trim(),
+      fotoImpEntrada: urlImpEntrada,
+      fotoPuntoEntrada: urlPuntoEntrada,
+      completado: false
+    };
+
+    // Guardar en activos y en historial
+    await set(ref(db, `sammy/registros_activos/${usuarioActual.cedula}`), registro);
+    const newRef = push(ref(db, `sammy/historial/${hoy()}`));
+    registro.registroId = newRef.key;
+    await set(newRef, registro);
+
+    // Guardar ID del registro en activo para luego actualizar
+    await update(ref(db, `sammy/registros_activos/${usuarioActual.cedula}`), { registroId: newRef.key });
+
+    registroActivo = { ...registro, registroId: newRef.key };
+    fotosData = {}; estadoExhibicion = '';
+    mostrarToast('¡Entrada registrada! ✓', 'exito');
+    renderContenidoImp();
+  } catch(e) {
+    console.error(e);
+    mostrarToast('Error al guardar. Intenta de nuevo.', 'error');
+    btn.disabled = false; btn.textContent = 'Registrar Entrada ✓';
+  }
+};
+
+window.registrarSalida = async function() {
+  if (!fotosData['foto-salida-imp']) { mostrarToast('Falta tu foto de salida', 'error'); return; }
+  if (!fotosData['foto-salida-punto']) { mostrarToast('Falta la foto del punto al salir', 'error'); return; }
+
+  const btn = document.querySelector('#contenido-imp .btn-primary');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  try {
+    const ts = Date.now();
+    const ruta = `sammy_fotos/${usuarioActual.cedula}/${hoy()}`;
+    const [urlImpSalida, urlPuntoSalida] = await Promise.all([
+      subirFoto(fotosData['foto-salida-imp'], `${ruta}/salida_imp_${ts}.jpg`),
+      subirFoto(fotosData['foto-salida-punto'], `${ruta}/salida_punto_${ts}.jpg`)
+    ]);
+
+    const actualizacion = {
+      horaSalida: horaActual(),
+      tsSalida: ts,
+      ventas: document.getElementById('ventas-input').value || 0,
+      productoMasVendido: document.getElementById('producto-mas-vendido').value.trim(),
+      fotoImpSalida: urlImpSalida,
+      fotoPuntoSalida: urlPuntoSalida,
+      completado: true
+    };
+
+    const rid = registroActivo.registroId;
+    await Promise.all([
+      update(ref(db, `sammy/historial/${hoy()}/${rid}`), actualizacion),
+      set(ref(db, `sammy/registros_activos/${usuarioActual.cedula}`), null)
+    ]);
+
+    registroActivo = null; fotosData = {};
+    mostrarToast('¡Salida registrada! Hasta mañana 🌸', 'exito');
+    setTimeout(() => { renderContenidoImp(); }, 1500);
+  } catch(e) {
+    console.error(e);
+    mostrarToast('Error al guardar. Intenta de nuevo.', 'error');
+    btn.disabled = false; btn.textContent = 'Registrar Salida ✓';
+  }
+};
+
+// ===== PANEL ADMIN =====
+function mostrarPantallaAdmin() {
+  mostrarPantalla('admin');
+  actualizarFechaAdmin();
+  timerAdmin = setInterval(actualizarFechaAdmin, 30000);
+
+  // Poblar filtro impulsadoras
+  const sel = document.getElementById('filtro-imp');
+  Object.values(IMPULSADORAS).forEach(imp => {
+    const opt = document.createElement('option');
+    opt.value = imp.nombre;
+    opt.textContent = imp.nombre.split(' ').slice(0,2).join(' ');
+    sel.appendChild(opt);
+  });
+
+  // Fecha default
+  document.getElementById('filtro-fecha').value = hoy();
+
+  iniciarTiempoReal();
+  cargarHistorial();
+}
+
+function actualizarFechaAdmin() {
+  const d = new Date();
+  document.getElementById('admin-fecha-hora').textContent =
+    d.toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'short' });
+}
+
+window.adminTab = function(tab) {
+  document.querySelectorAll('.admin-tab').forEach((t, i) => {
+    t.classList.toggle('activo', (tab === 'tiempo-real' && i === 0) || (tab === 'historial' && i === 1));
+  });
+  document.getElementById('admin-tiempo-real').style.display = tab === 'tiempo-real' ? '' : 'none';
+  document.getElementById('admin-historial').style.display = tab === 'historial' ? '' : 'none';
+};
+
+function iniciarTiempoReal() {
+  const activosRef = ref(db, 'sammy/registros_activos');
+  onValue(activosRef, snap => {
+    const activos = snap.val() || {};
+    renderTiempoReal(activos);
+  });
+}
+
+function renderTiempoReal(activos) {
+  const lista = document.getElementById('lista-tiempo-real');
+  const totalImp = Object.keys(IMPULSADORAS).length;
+  const enPunto = Object.keys(activos).length;
+  const activasHoy = enPunto; // simplificado
+
+  document.getElementById('stat-activas').textContent = activasHoy;
+  document.getElementById('stat-en-punto').textContent = enPunto;
+  document.getElementById('stat-total').textContent = totalImp;
+
+  let html = '';
+
+  // Primero las activas
+  Object.values(activos).forEach(r => {
+    const mins = Math.floor((Date.now() - r.tsEntrada) / 60000);
+    const hrs = Math.floor(mins / 60);
+    const minR = mins % 60;
+    const tiempo = hrs > 0 ? `${hrs}h ${minR}m en punto` : `${mins}m en punto`;
+    html += `
+      <div class="imp-card en-punto">
+        <div class="imp-avatar">${iniciales(r.nombre)}</div>
+        <div class="imp-info">
+          <div class="imp-nombre">${r.nombre}</div>
+          <div class="imp-detalle">${r.punto.tienda} · ${r.punto.ciudad}</div>
+          <div class="imp-tiempo">⦿ ${tiempo} · Entró ${r.horaEntrada}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  // Luego las libres
+  const cedulasActivas = Object.keys(activos);
+  Object.entries(IMPULSADORAS).forEach(([ced, imp]) => {
+    if (!cedulasActivas.includes(ced)) {
+      html += `
+        <div class="imp-card libre">
+          <div class="imp-avatar" style="background: linear-gradient(135deg,#E0D0D5,#C8B0B8)">${iniciales(imp.nombre)}</div>
+          <div class="imp-info">
+            <div class="imp-nombre">${imp.nombre}</div>
+            <div class="imp-detalle">${imp.ciudad}</div>
+            <div style="font-size:0.75rem;color:var(--texto-suave)">Sin registro hoy</div>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  lista.innerHTML = html;
+}
+
+window.cargarHistorial = async function() {
+  const lista = document.getElementById('lista-historial');
+  lista.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+
+  const fecha = document.getElementById('filtro-fecha').value || hoy();
+  const impFiltro = document.getElementById('filtro-imp').value;
+  const ciudadFiltro = document.getElementById('filtro-ciudad').value;
+
+  try {
+    const snap = await get(ref(db, `sammy/historial/${fecha}`));
+    if (!snap.exists()) {
+      lista.innerHTML = '<div class="empty-state"><div class="icono">📭</div><p>Sin registros para esta fecha</p></div>';
+      return;
+    }
+
+    let registros = Object.values(snap.val());
+
+    if (impFiltro) registros = registros.filter(r => r.nombre === impFiltro);
+    if (ciudadFiltro) registros = registros.filter(r => r.punto?.ciudad === ciudadFiltro || r.ciudadBase === ciudadFiltro);
+
+    registros.sort((a, b) => b.tsEntrada - a.tsEntrada);
+
+    if (!registros.length) {
+      lista.innerHTML = '<div class="empty-state"><div class="icono">🔍</div><p>Sin registros con estos filtros</p></div>';
+      return;
+    }
+
+    lista.innerHTML = registros.map(r => {
+      const estadoClass = r.estadoExhibicion === 'Bien' ? 'verde' : r.estadoExhibicion === 'Regular' ? 'naranja' : 'rojo';
+      const completadoBadge = r.completado
+        ? '<span class="completado-badge">✓ Completo</span>'
+        : '<span class="pendiente-badge">⦿ En punto</span>';
+
+      const fotos = [
+        { url: r.fotoImpEntrada, label: '🤳' },
+        { url: r.fotoPuntoEntrada, label: '🏪' },
+        { url: r.fotoImpSalida, label: '👋' },
+        { url: r.fotoPuntoSalida, label: '🏁' }
+      ];
+
+      const fotosHtml = fotos.map(f => f.url
+        ? `<img class="foto-thumb" src="${f.url}" onclick="abrirFoto('${f.url}')" title="${f.label}">`
+        : `<div class="foto-placeholder">${f.label}</div>`
+      ).join('');
+
+      return `
+        <div class="registro-card">
+          <div class="reg-header">
+            <div>
+              <div class="reg-nombre">${r.nombre}</div>
+              <div class="reg-fecha">${r.punto?.tienda} · ${r.punto?.ciudad}</div>
+            </div>
+            <div style="text-align:right">
+              ${completadoBadge}
+              <div class="reg-fecha" style="margin-top:4px">${r.horaEntrada}${r.horaSalida ? ' → ' + r.horaSalida : ''}</div>
+            </div>
+          </div>
+          <div class="reg-datos">
+            <div class="reg-dato">
+              <div class="reg-dato-label">Exhibición al llegar</div>
+              <div class="reg-dato-val ${estadoClass}">${r.estadoExhibicion || '—'}</div>
+            </div>
+            <div class="reg-dato">
+              <div class="reg-dato-label">Ventas del día</div>
+              <div class="reg-dato-val">${formatPesos(r.ventas)}</div>
+            </div>
+            ${r.agotados ? `<div class="reg-dato" style="grid-column:span 2">
+              <div class="reg-dato-label">Agotados</div>
+              <div class="reg-dato-val rojo">${r.agotados}</div>
+            </div>` : ''}
+            ${r.sobrestock ? `<div class="reg-dato" style="grid-column:span 2">
+              <div class="reg-dato-label">Sobrestock</div>
+              <div class="reg-dato-val naranja">${r.sobrestock}</div>
+            </div>` : ''}
+            ${r.productoMasVendido ? `<div class="reg-dato" style="grid-column:span 2">
+              <div class="reg-dato-label">Producto más vendido</div>
+              <div class="reg-dato-val">${r.productoMasVendido}</div>
+            </div>` : ''}
+          </div>
+          <div class="fotos-grid">${fotosHtml}</div>
+        </div>
+      `;
+    }).join('');
+
+  } catch(e) {
+    console.error(e);
+    lista.innerHTML = '<div class="empty-state"><div class="icono">⚠️</div><p>Error al cargar. Intenta de nuevo.</p></div>';
+  }
+};
+
+window.abrirFoto = function(url) {
+  document.getElementById('modal-img').src = url;
+  document.getElementById('modal-foto').classList.add('abierto');
+};
+window.cerrarModal = function() {
+  document.getElementById('modal-foto').classList.remove('abierto');
+};
+
+// Enter en inputs
+document.getElementById('cedula-input').addEventListener('keydown', e => { if (e.key === 'Enter') window.loginImpulsadora(); });
+document.getElementById('admin-pass').addEventListener('keydown', e => { if (e.key === 'Enter') window.loginAdmin(); });
+</script>
+</body>
+</html>
