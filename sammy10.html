@@ -422,6 +422,103 @@ body {
 .admin-tab.activo { color: var(--rosa); border-bottom-color: var(--rosa); }
 
 .admin-contenido { padding: 20px; }
+pre { margin: 0; }
+
+/* ===== CONFIG / JSON ===== */
+.cfg-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: var(--sombra2);
+}
+.cfg-titulo {
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--texto-suave);
+  margin-bottom: 12px;
+}
+.cfg-desc {
+  font-size: 0.82rem;
+  color: var(--texto-suave);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.cfg-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.cfg-badge-ok { background: #E8F5EE; color: var(--verde); border: 1.5px solid var(--verde); }
+.cfg-badge-error { background: #FEE; color: var(--rojo); border: 1.5px solid var(--rojo); }
+.cfg-badge-checking { background: var(--crema2); color: var(--texto-suave); border: 1.5px solid var(--crema2); }
+.cfg-mono-box {
+  background: #1E1218;
+  color: #F7C5D0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  line-height: 1.7;
+  word-break: break-all;
+}
+.cfg-mono-resultado { color: #A8E6C5; margin-top: 8px; }
+.cfg-resultado-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.cfg-btn-primary {
+  padding: 12px;
+  background: linear-gradient(135deg, var(--rosa), var(--rosa-oscuro));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cfg-btn-primary:hover { opacity: 0.9; }
+.cfg-btn-secondary {
+  padding: 12px;
+  background: transparent;
+  color: var(--rosa);
+  border: 2px solid var(--rosa);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cfg-btn-secondary:hover { background: var(--rosa); color: white; }
+.cfg-btn-ghost {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--crema);
+  color: var(--texto);
+  border: 1.5px solid var(--crema2);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+.cfg-btn-ghost:hover { border-color: var(--rosa-claro); background: #FFF5F7; color: var(--rosa); }
 
 /* TIEMPO REAL */
 .stats-grid {
@@ -741,6 +838,7 @@ body {
   <div class="admin-tabs">
     <button class="admin-tab activo" onclick="adminTab('tiempo-real')">⦿ Tiempo Real</button>
     <button class="admin-tab" onclick="adminTab('historial')">Historial</button>
+    <button class="admin-tab" onclick="adminTab('json')">⚙ JSON</button>
   </div>
 
   <div class="admin-contenido">
@@ -794,7 +892,63 @@ body {
         <div class="loading"><div class="spinner"></div> Cargando...</div>
       </div>
     </div>
-  </div>
+
+    <!-- CONFIG / JSON -->
+    <div id="admin-json" style="display:none">
+
+      <!-- FIREBASE STATUS -->
+      <div class="cfg-card">
+        <div class="cfg-titulo">🔥 Firebase</div>
+        <div id="cfg-fb-status" class="cfg-badge cfg-badge-checking">⏳ Verificando conexión...</div>
+        <div class="cfg-fb-info" id="cfg-fb-info">
+          <div class="cfg-mono-box">
+            databaseURL: registro-de-ingreso-sammy-default-rtdb<br>
+            projectId: registro-de-ingreso-sammy<br>
+            storageBucket: registro-de-ingreso-sammy.firebasestorage.app
+          </div>
+        </div>
+      </div>
+
+      <!-- LEER / ESCRIBIR JSON -->
+      <div class="cfg-card">
+        <div class="cfg-titulo">⚙ Datos Firebase</div>
+        <p class="cfg-desc">Lee o escribe datos directamente en la base de datos. Útil para cargar registros manualmente o corregir información.</p>
+
+        <div class="campo">
+          <label>Ruta en Firebase</label>
+          <input type="text" id="json-ruta" placeholder="Ej: sammy/historial/2026-06-06" style="font-family:monospace;font-size:0.85rem">
+        </div>
+        <div class="campo">
+          <label>JSON a guardar</label>
+          <textarea id="json-input" style="height:180px;font-family:monospace;font-size:0.78rem;resize:vertical;line-height:1.5" placeholder='&#123;&#10;  "nombre": "Laura Cristina Rave",&#10;  "horaEntrada": "09:05"&#10;&#125;'></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <button class="cfg-btn-primary" onclick="guardarJSON()">💾 Guardar</button>
+          <button class="cfg-btn-secondary" onclick="leerJSON()">🔍 Leer ruta</button>
+        </div>
+        <button class="cfg-btn-ghost" onclick="limpiarJSON()">✕ Limpiar</button>
+
+        <div id="json-resultado" style="display:none;margin-top:16px">
+          <div class="cfg-resultado-label" id="json-resultado-label">RESULTADO</div>
+          <div class="cfg-mono-box cfg-mono-resultado">
+            <pre id="json-resultado-texto" style="white-space:pre-wrap;word-break:break-all;margin:0;font-size:0.78rem;max-height:260px;overflow-y:auto"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCIONES RÁPIDAS -->
+      <div class="cfg-card">
+        <div class="cfg-titulo">⚡ Acciones rápidas</div>
+        <p class="cfg-desc">Lee rutas comunes con un toque.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="cfg-btn-ghost" onclick="accionRapida('sammy/registros_activos')">Ver activas ahora →</button>
+          <button class="cfg-btn-ghost" onclick="accionRapida('sammy/historial/' + hoy())">Ver historial de hoy →</button>
+          <button class="cfg-btn-ghost" onclick="accionRapida('sammy')">Ver toda la BD →</button>
+        </div>
+      </div>
+
+    </div>
 </div>
 
 <!-- MODAL FOTO -->
@@ -807,12 +961,13 @@ body {
 <div class="toast" id="toast"></div>
 
 <!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as sref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-const firebaseConfig = {
+<!-- FIREBASE COMPAT (funciona con onclick) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script>
+firebase.initializeApp({
   apiKey: "AIzaSyCYcoZ_0mcYV8DD72nc2OxnIcmnKcP0irw",
   authDomain: "registro-de-ingreso-sammy.firebaseapp.com",
   databaseURL: "https://registro-de-ingreso-sammy-default-rtdb.firebaseio.com",
@@ -820,11 +975,9 @@ const firebaseConfig = {
   storageBucket: "registro-de-ingreso-sammy.firebasestorage.app",
   messagingSenderId: "265642944973",
   appId: "1:265642944973:web:65014cafe0d6b29884fc84"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const storage = getStorage(app);
+});
+const db = firebase.database();
+const storage = firebase.storage();
 
 // ===== DATOS IMPULSADORAS =====
 const IMPULSADORAS = {
@@ -958,12 +1111,12 @@ const IMPULSADORAS = {
 };
 
 // Estado global
-let usuarioActual = null;
-let puntoSeleccionado = null;
-let registroActivo = null;
-let fotosData = {};
-let estadoExhibicion = '';
-let timerAdmin = null;
+var usuarioActual = null;
+var puntoSeleccionado = null;
+var registroActivo = null;
+var fotosData = {};
+var estadoExhibicion = '';
+var timerAdmin = null;
 
 // ===== UTILIDADES =====
 function hoy() {
@@ -972,51 +1125,51 @@ function hoy() {
 function horaActual() {
   return new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 }
-function fechaLegible(ts) {
-  if (!ts) return '';
-  return new Date(ts).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' });
-}
-function mostrarToast(msg, tipo='') {
-  const t = document.getElementById('toast');
+function mostrarToast(msg, tipo) {
+  var t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast visible ' + tipo;
-  setTimeout(() => t.className = 'toast', 3000);
+  t.className = 'toast visible ' + (tipo || '');
+  setTimeout(function(){ t.className = 'toast'; }, 3000);
 }
 function formatPesos(n) {
-  if (!n) return '—';
+  if (!n || n == 0) return '—';
   return '$ ' + Number(n).toLocaleString('es-CO');
 }
 function iniciales(nombre) {
-  return nombre.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+  return nombre.split(' ').slice(0,2).map(function(n){ return n[0]; }).join('').toUpperCase();
+}
+function mostrarPantalla(id) {
+  document.querySelectorAll('.pantalla').forEach(function(p){ p.classList.remove('activa'); });
+  document.getElementById('pantalla-' + id).classList.add('activa');
 }
 
 // ===== LOGIN =====
-window.cambiarTab = function(tab) {
-  document.querySelectorAll('.login-tab').forEach((t, i) => {
+function cambiarTab(tab) {
+  document.querySelectorAll('.login-tab').forEach(function(t, i){
     t.classList.toggle('activo', (tab === 'impulsadora' && i === 0) || (tab === 'admin' && i === 1));
   });
   document.getElementById('tab-impulsadora').style.display = tab === 'impulsadora' ? '' : 'none';
   document.getElementById('tab-admin').style.display = tab === 'admin' ? '' : 'none';
   document.getElementById('error-login').classList.remove('visible');
-};
+}
 
-window.loginImpulsadora = function() {
-  const cedula = document.getElementById('cedula-input').value.trim();
-  const err = document.getElementById('error-login');
-  const imp = IMPULSADORAS[cedula];
+function loginImpulsadora() {
+  var cedula = document.getElementById('cedula-input').value.trim();
+  var err = document.getElementById('error-login');
+  var imp = IMPULSADORAS[cedula];
   if (!imp) {
     err.textContent = 'Cédula no encontrada. Verifica e intenta de nuevo.';
     err.classList.add('visible');
     return;
   }
   err.classList.remove('visible');
-  usuarioActual = { cedula, ...imp };
+  usuarioActual = Object.assign({ cedula: cedula }, imp);
   mostrarPantallaImpulsadora();
-};
+}
 
-window.loginAdmin = function() {
-  const pass = document.getElementById('admin-pass').value;
-  const err = document.getElementById('error-login');
+function loginAdmin() {
+  var pass = document.getElementById('admin-pass').value;
+  var err = document.getElementById('error-login');
   if (pass !== 'sammy2026') {
     err.textContent = 'Contraseña incorrecta.';
     err.classList.add('visible');
@@ -1024,202 +1177,191 @@ window.loginAdmin = function() {
   }
   err.classList.remove('visible');
   mostrarPantallaAdmin();
-};
+}
 
-window.cerrarSesion = function() {
+function cerrarSesion() {
   if (timerAdmin) clearInterval(timerAdmin);
   usuarioActual = null; puntoSeleccionado = null; registroActivo = null; fotosData = {}; estadoExhibicion = '';
   document.getElementById('cedula-input').value = '';
   document.getElementById('admin-pass').value = '';
   mostrarPantalla('login');
-};
-
-function mostrarPantalla(id) {
-  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
-  document.getElementById('pantalla-' + id).classList.add('activa');
 }
 
 // ===== PANTALLA IMPULSADORA =====
-async function mostrarPantallaImpulsadora() {
+function mostrarPantallaImpulsadora() {
   mostrarPantalla('impulsadora');
-  const d = new Date();
-  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  document.getElementById('imp-saludo').textContent = `¡Hola, ${usuarioActual.nombre.split(' ')[0]}!`;
-  document.getElementById('imp-fecha').textContent = `${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]} de ${d.getFullYear()}`;
-
-  // Verificar si hay registro activo hoy
-  await verificarRegistroActivo();
-  renderContenidoImp();
+  var d = new Date();
+  var dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('imp-saludo').textContent = '¡Hola, ' + usuarioActual.nombre.split(' ')[0] + '!';
+  document.getElementById('imp-fecha').textContent = dias[d.getDay()] + ', ' + d.getDate() + ' de ' + meses[d.getMonth()] + ' de ' + d.getFullYear();
+  verificarRegistroActivo();
 }
 
-async function verificarRegistroActivo() {
-  const snapRef = ref(db, `sammy/registros_activos/${usuarioActual.cedula}`);
-  const snap = await get(snapRef);
-  registroActivo = snap.exists() ? snap.val() : null;
+function verificarRegistroActivo() {
+  var cont = document.getElementById('contenido-imp');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  db.ref('sammy/registros_activos/' + usuarioActual.cedula).get().then(function(snap){
+    registroActivo = snap.exists() ? snap.val() : null;
+    renderContenidoImp();
+  }).catch(function(e){
+    console.error('Error Firebase:', e);
+    registroActivo = null;
+    renderContenidoImp();
+    mostrarToast('Advertencia: sin conexión a Firebase', 'error');
+  });
 }
 
 function renderContenidoImp() {
-  const cont = document.getElementById('contenido-imp');
-
+  var cont = document.getElementById('contenido-imp');
   if (registroActivo) {
-    // Está en un punto → mostrar resumen y botón de salida
-    const punto = registroActivo.punto;
-    cont.innerHTML = `
-      <div class="resumen-activa">
-        <h3>⦿ Actualmente en punto</h3>
-        <div class="resumen-row"><span>Tienda</span><span>${punto.tienda}</span></div>
-        <div class="resumen-row"><span>Cadena</span><span>${punto.cadena}</span></div>
-        <div class="resumen-row"><span>Ciudad</span><span>${punto.ciudad}</span></div>
-        <div class="resumen-row"><span>Hora entrada</span><span>${registroActivo.horaEntrada}</span></div>
-        <div class="resumen-row"><span>Estado exhibición</span><span>${registroActivo.estadoExhibicion || '—'}</span></div>
-      </div>
-      <div class="form-section">
-        <h3>📸 Registro de Salida</h3>
-        <div class="campo"><label>Foto de ti (al salir)</label>
-          <div class="foto-upload" id="fu-salida-imp" onclick="triggerFoto('foto-salida-imp')">
-            <input type="file" id="foto-salida-imp" accept="image/*" capture="user" onchange="previewFoto(this,'prev-salida-imp','fu-salida-imp')">
-            <div class="icono">🤳</div><p>Tomar foto</p>
-            <img class="foto-preview" id="prev-salida-imp">
-          </div>
-        </div>
-        <div class="campo"><label>Foto del punto (cómo lo dejas)</label>
-          <div class="foto-upload" id="fu-salida-punto" onclick="triggerFoto('foto-salida-punto')">
-            <input type="file" id="foto-salida-punto" accept="image/*" capture="environment" onchange="previewFoto(this,'prev-salida-punto','fu-salida-punto')">
-            <div class="icono">🏪</div><p>Foto del punto</p>
-            <img class="foto-preview" id="prev-salida-punto">
-          </div>
-        </div>
-        <div class="campo"><label>Ventas del día (total)</label>
-          <div class="campo-pesos"><input type="number" id="ventas-input" placeholder="0" inputmode="numeric"></div>
-        </div>
-        <div class="campo"><label>Producto más vendido</label>
-          <input type="text" id="producto-mas-vendido" placeholder="Ej: Base líquida tono 3...">
-        </div>
-        <button class="btn-primary" onclick="registrarSalida()">Registrar Salida ✓</button>
-      </div>
-    `;
+    var punto = registroActivo.punto;
+    cont.innerHTML =
+      '<div class="resumen-activa">' +
+        '<h3>⦿ Actualmente en punto</h3>' +
+        '<div class="resumen-row"><span>Tienda</span><span>' + punto.tienda + '</span></div>' +
+        '<div class="resumen-row"><span>Cadena</span><span>' + punto.cadena + '</span></div>' +
+        '<div class="resumen-row"><span>Ciudad</span><span>' + punto.ciudad + '</span></div>' +
+        '<div class="resumen-row"><span>Hora entrada</span><span>' + registroActivo.horaEntrada + '</span></div>' +
+        '<div class="resumen-row"><span>Estado exhibición</span><span>' + (registroActivo.estadoExhibicion || '—') + '</span></div>' +
+      '</div>' +
+      '<div class="form-section">' +
+        '<h3>📸 Registro de Salida</h3>' +
+        '<div class="campo"><label>Foto de ti (al salir)</label>' +
+          '<div class="foto-upload" id="fu-salida-imp" onclick="triggerFoto(\'foto-salida-imp\')">' +
+            '<input type="file" id="foto-salida-imp" accept="image/*" capture="user" onchange="previewFoto(this,\'prev-salida-imp\',\'fu-salida-imp\')">' +
+            '<div class="icono">🤳</div><p>Tomar foto</p>' +
+            '<img class="foto-preview" id="prev-salida-imp">' +
+          '</div>' +
+        '</div>' +
+        '<div class="campo"><label>Foto del punto (cómo lo dejas)</label>' +
+          '<div class="foto-upload" id="fu-salida-punto" onclick="triggerFoto(\'foto-salida-punto\')">' +
+            '<input type="file" id="foto-salida-punto" accept="image/*" capture="environment" onchange="previewFoto(this,\'prev-salida-punto\',\'fu-salida-punto\')">' +
+            '<div class="icono">🏪</div><p>Foto del punto</p>' +
+            '<img class="foto-preview" id="prev-salida-punto">' +
+          '</div>' +
+        '</div>' +
+        '<div class="campo"><label>Ventas del día (total)</label>' +
+          '<div class="campo-pesos"><input type="number" id="ventas-input" placeholder="0" inputmode="numeric"></div>' +
+        '</div>' +
+        '<div class="campo"><label>Producto más vendido</label>' +
+          '<input type="text" id="producto-mas-vendido" placeholder="Ej: Base líquida tono 3...">' +
+        '</div>' +
+        '<button class="btn-primary" onclick="registrarSalida()">Registrar Salida ✓</button>' +
+      '</div>';
   } else {
-    // No está en punto → seleccionar punto y registrar entrada
-    const listaPuntos = usuarioActual.puntos.map(p => `
-      <div class="punto-item" onclick="seleccionarPunto('${p.id}')">
-        <div>
-          <div class="punto-nombre">${p.tienda}</div>
-          <div style="font-size:0.75rem;color:var(--texto-suave);margin-top:2px">${p.dias}</div>
-        </div>
-        <span class="punto-cadena">${p.ciudad}</span>
-      </div>
-    `).join('');
+    var listaPuntos = usuarioActual.puntos.map(function(p){
+      return '<div class="punto-item" onclick="seleccionarPunto(\'' + p.id + '\')">' +
+        '<div>' +
+          '<div class="punto-nombre">' + p.tienda + '</div>' +
+          '<div style="font-size:0.75rem;color:var(--texto-suave);margin-top:2px">' + p.dias + '</div>' +
+        '</div>' +
+        '<span class="punto-cadena">' + p.ciudad + '</span>' +
+      '</div>';
+    }).join('');
 
-    cont.innerHTML = `
-      <div class="estado-card">
-        <h3>Tu estado hoy</h3>
-        <span class="badge-estado badge-libre"><span class="badge-dot"></span> Disponible</span>
-      </div>
-      <div class="form-section">
-        <h3>📍 Selecciona el punto de hoy</h3>
-        <div class="puntos-lista">${listaPuntos}</div>
-      </div>
-      <div id="form-entrada" style="display:none">
-        <div class="form-section">
-          <h3>📸 Registro de Entrada</h3>
-          <div class="campo"><label>Foto de ti (al llegar)</label>
-            <div class="foto-upload" id="fu-entrada-imp" onclick="triggerFoto('foto-entrada-imp')">
-              <input type="file" id="foto-entrada-imp" accept="image/*" capture="user" onchange="previewFoto(this,'prev-entrada-imp','fu-entrada-imp')">
-              <div class="icono">🤳</div><p>Tomar foto</p>
-              <img class="foto-preview" id="prev-entrada-imp">
-            </div>
-          </div>
-          <div class="campo"><label>Foto del punto (cómo lo encuentras)</label>
-            <div class="foto-upload" id="fu-entrada-punto" onclick="triggerFoto('foto-entrada-punto')">
-              <input type="file" id="foto-entrada-punto" accept="image/*" capture="environment" onchange="previewFoto(this,'prev-entrada-punto','fu-entrada-punto')">
-              <div class="icono">🏪</div><p>Foto del punto</p>
-              <img class="foto-preview" id="prev-entrada-punto">
-            </div>
-          </div>
-          <div class="campo">
-            <label>Estado de la exhibición al llegar</label>
-            <div class="opciones-estado">
-              <div class="opcion-estado bien" onclick="selEstado('Bien')">👍 Bien</div>
-              <div class="opcion-estado regular" onclick="selEstado('Regular')">😐 Regular</div>
-              <div class="opcion-estado mal" onclick="selEstado('Mal')">👎 Mal</div>
-            </div>
-          </div>
-          <div class="campo"><label>Productos agotados</label>
-            <textarea id="agotados-input" placeholder="Escribe los productos agotados..."></textarea>
-          </div>
-          <div class="campo"><label>Sobrestock</label>
-            <textarea id="sobrestock-input" placeholder="Escribe los productos con sobrestock..."></textarea>
-          </div>
-          <button class="btn-primary" onclick="registrarEntrada()">Registrar Entrada ✓</button>
-        </div>
-      </div>
-    `;
+    cont.innerHTML =
+      '<div class="estado-card">' +
+        '<h3>Tu estado hoy</h3>' +
+        '<span class="badge-estado badge-libre"><span class="badge-dot"></span> Disponible</span>' +
+      '</div>' +
+      '<div class="form-section">' +
+        '<h3>📍 Selecciona el punto de hoy</h3>' +
+        '<div class="puntos-lista">' + listaPuntos + '</div>' +
+      '</div>' +
+      '<div id="form-entrada" style="display:none">' +
+        '<div class="form-section">' +
+          '<h3>📸 Registro de Entrada</h3>' +
+          '<div class="campo"><label>Foto de ti (al llegar)</label>' +
+            '<div class="foto-upload" id="fu-entrada-imp" onclick="triggerFoto(\'foto-entrada-imp\')">' +
+              '<input type="file" id="foto-entrada-imp" accept="image/*" capture="user" onchange="previewFoto(this,\'prev-entrada-imp\',\'fu-entrada-imp\')">' +
+              '<div class="icono">🤳</div><p>Tomar foto</p>' +
+              '<img class="foto-preview" id="prev-entrada-imp">' +
+            '</div>' +
+          '</div>' +
+          '<div class="campo"><label>Foto del punto (cómo lo encuentras)</label>' +
+            '<div class="foto-upload" id="fu-entrada-punto" onclick="triggerFoto(\'foto-entrada-punto\')">' +
+              '<input type="file" id="foto-entrada-punto" accept="image/*" capture="environment" onchange="previewFoto(this,\'prev-entrada-punto\',\'fu-entrada-punto\')">' +
+              '<div class="icono">🏪</div><p>Foto del punto</p>' +
+              '<img class="foto-preview" id="prev-entrada-punto">' +
+            '</div>' +
+          '</div>' +
+          '<div class="campo">' +
+            '<label>Estado de la exhibición al llegar</label>' +
+            '<div class="opciones-estado">' +
+              '<div class="opcion-estado bien" onclick="selEstado(this,\'Bien\')">👍 Bien</div>' +
+              '<div class="opcion-estado regular" onclick="selEstado(this,\'Regular\')">😐 Regular</div>' +
+              '<div class="opcion-estado mal" onclick="selEstado(this,\'Mal\')">👎 Mal</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="campo"><label>Productos agotados</label>' +
+            '<textarea id="agotados-input" placeholder="Escribe los productos agotados..."></textarea>' +
+          '</div>' +
+          '<div class="campo"><label>Sobrestock</label>' +
+            '<textarea id="sobrestock-input" placeholder="Escribe los productos con sobrestock..."></textarea>' +
+          '</div>' +
+          '<button class="btn-primary" onclick="registrarEntrada()">Registrar Entrada ✓</button>' +
+        '</div>' +
+      '</div>';
   }
 }
 
-window.seleccionarPunto = function(id) {
-  puntoSeleccionado = usuarioActual.puntos.find(p => p.id === id);
-  document.querySelectorAll('.punto-item').forEach(el => el.classList.remove('seleccionado'));
+function seleccionarPunto(id) {
+  puntoSeleccionado = usuarioActual.puntos.find(function(p){ return p.id === id; });
+  document.querySelectorAll('.punto-item').forEach(function(el){ el.classList.remove('seleccionado'); });
   event.currentTarget.classList.add('seleccionado');
-  document.getElementById('form-entrada').style.display = '';
-  document.getElementById('form-entrada').scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
+  var fe = document.getElementById('form-entrada');
+  fe.style.display = '';
+  fe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-window.selEstado = function(val) {
+function selEstado(el, val) {
   estadoExhibicion = val;
-  document.querySelectorAll('.opcion-estado').forEach(el => el.classList.remove('sel'));
-  event.currentTarget.classList.add('sel');
-};
+  document.querySelectorAll('.opcion-estado').forEach(function(e){ e.classList.remove('sel'); });
+  el.classList.add('sel');
+}
 
-window.triggerFoto = function(id) {
+function triggerFoto(id) {
   document.getElementById(id).click();
-};
+}
 
-window.previewFoto = function(input, prevId, uploadId) {
-  const file = input.files[0];
+function previewFoto(input, prevId, uploadId) {
+  var file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const prev = document.getElementById(prevId);
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var prev = document.getElementById(prevId);
     prev.src = e.target.result;
     prev.classList.add('visible');
     document.getElementById(uploadId).classList.add('con-foto');
     fotosData[input.id] = e.target.result;
   };
   reader.readAsDataURL(file);
-};
-
-async function subirFoto(base64, ruta) {
-  if (!base64) return null;
-  try {
-    const fRef = sref(storage, ruta);
-    await uploadString(fRef, base64, 'data_url');
-    return await getDownloadURL(fRef);
-  } catch(e) {
-    console.error('Error subiendo foto:', e);
-    return null;
-  }
 }
 
-window.registrarEntrada = async function() {
+function subirFoto(base64, ruta) {
+  if (!base64) return Promise.resolve(null);
+  var fRef = storage.ref(ruta);
+  return fRef.putString(base64, 'data_url').then(function(){ return fRef.getDownloadURL(); }).catch(function(){ return null; });
+}
+
+function registrarEntrada() {
   if (!puntoSeleccionado) { mostrarToast('Selecciona un punto primero', 'error'); return; }
   if (!fotosData['foto-entrada-imp']) { mostrarToast('Falta tu foto de entrada', 'error'); return; }
   if (!fotosData['foto-entrada-punto']) { mostrarToast('Falta la foto del punto', 'error'); return; }
   if (!estadoExhibicion) { mostrarToast('Selecciona el estado de la exhibición', 'error'); return; }
 
-  const btn = document.querySelector('#form-entrada .btn-primary');
+  var btn = document.querySelector('#form-entrada .btn-primary');
   btn.disabled = true; btn.textContent = 'Guardando...';
 
-  try {
-    const ts = Date.now();
-    const ruta = `sammy_fotos/${usuarioActual.cedula}/${hoy()}`;
-    const [urlImpEntrada, urlPuntoEntrada] = await Promise.all([
-      subirFoto(fotosData['foto-entrada-imp'], `${ruta}/entrada_imp_${ts}.jpg`),
-      subirFoto(fotosData['foto-entrada-punto'], `${ruta}/entrada_punto_${ts}.jpg`)
-    ]);
+  var ts = Date.now();
+  var ruta = 'sammy_fotos/' + usuarioActual.cedula + '/' + hoy();
 
-    const registro = {
+  Promise.all([
+    subirFoto(fotosData['foto-entrada-imp'], ruta + '/entrada_imp_' + ts + '.jpg'),
+    subirFoto(fotosData['foto-entrada-punto'], ruta + '/entrada_punto_' + ts + '.jpg')
+  ]).then(function(urls) {
+    var registro = {
       cedula: usuarioActual.cedula,
       nombre: usuarioActual.nombre,
       ciudadBase: usuarioActual.ciudad,
@@ -1227,74 +1369,69 @@ window.registrarEntrada = async function() {
       fecha: hoy(),
       horaEntrada: horaActual(),
       tsEntrada: ts,
-      estadoExhibicion,
+      estadoExhibicion: estadoExhibicion,
       agotados: document.getElementById('agotados-input').value.trim(),
       sobrestock: document.getElementById('sobrestock-input').value.trim(),
-      fotoImpEntrada: urlImpEntrada,
-      fotoPuntoEntrada: urlPuntoEntrada,
+      fotoImpEntrada: urls[0],
+      fotoPuntoEntrada: urls[1],
       completado: false
     };
-
-    // Guardar en activos y en historial
-    await set(ref(db, `sammy/registros_activos/${usuarioActual.cedula}`), registro);
-    const newRef = push(ref(db, `sammy/historial/${hoy()}`));
+    var newRef = db.ref('sammy/historial/' + hoy()).push();
     registro.registroId = newRef.key;
-    await set(newRef, registro);
-
-    // Guardar ID del registro en activo para luego actualizar
-    await update(ref(db, `sammy/registros_activos/${usuarioActual.cedula}`), { registroId: newRef.key });
-
-    registroActivo = { ...registro, registroId: newRef.key };
+    return Promise.all([
+      db.ref('sammy/registros_activos/' + usuarioActual.cedula).set(registro),
+      newRef.set(registro)
+    ]).then(function(){ return registro; });
+  }).then(function(registro) {
+    registroActivo = registro;
     fotosData = {}; estadoExhibicion = '';
     mostrarToast('¡Entrada registrada! ✓', 'exito');
     renderContenidoImp();
-  } catch(e) {
+  }).catch(function(e) {
     console.error(e);
     mostrarToast('Error al guardar. Intenta de nuevo.', 'error');
     btn.disabled = false; btn.textContent = 'Registrar Entrada ✓';
-  }
-};
+  });
+}
 
-window.registrarSalida = async function() {
+function registrarSalida() {
   if (!fotosData['foto-salida-imp']) { mostrarToast('Falta tu foto de salida', 'error'); return; }
   if (!fotosData['foto-salida-punto']) { mostrarToast('Falta la foto del punto al salir', 'error'); return; }
 
-  const btn = document.querySelector('#contenido-imp .btn-primary');
+  var btn = document.querySelector('#contenido-imp .btn-primary');
   btn.disabled = true; btn.textContent = 'Guardando...';
 
-  try {
-    const ts = Date.now();
-    const ruta = `sammy_fotos/${usuarioActual.cedula}/${hoy()}`;
-    const [urlImpSalida, urlPuntoSalida] = await Promise.all([
-      subirFoto(fotosData['foto-salida-imp'], `${ruta}/salida_imp_${ts}.jpg`),
-      subirFoto(fotosData['foto-salida-punto'], `${ruta}/salida_punto_${ts}.jpg`)
-    ]);
+  var ts = Date.now();
+  var ruta = 'sammy_fotos/' + usuarioActual.cedula + '/' + hoy();
 
-    const actualizacion = {
+  Promise.all([
+    subirFoto(fotosData['foto-salida-imp'], ruta + '/salida_imp_' + ts + '.jpg'),
+    subirFoto(fotosData['foto-salida-punto'], ruta + '/salida_punto_' + ts + '.jpg')
+  ]).then(function(urls) {
+    var rid = registroActivo.registroId;
+    var actualizacion = {
       horaSalida: horaActual(),
       tsSalida: ts,
       ventas: document.getElementById('ventas-input').value || 0,
       productoMasVendido: document.getElementById('producto-mas-vendido').value.trim(),
-      fotoImpSalida: urlImpSalida,
-      fotoPuntoSalida: urlPuntoSalida,
+      fotoImpSalida: urls[0],
+      fotoPuntoSalida: urls[1],
       completado: true
     };
-
-    const rid = registroActivo.registroId;
-    await Promise.all([
-      update(ref(db, `sammy/historial/${hoy()}/${rid}`), actualizacion),
-      set(ref(db, `sammy/registros_activos/${usuarioActual.cedula}`), null)
+    return Promise.all([
+      db.ref('sammy/historial/' + hoy() + '/' + rid).update(actualizacion),
+      db.ref('sammy/registros_activos/' + usuarioActual.cedula).remove()
     ]);
-
+  }).then(function() {
     registroActivo = null; fotosData = {};
     mostrarToast('¡Salida registrada! Hasta mañana 🌸', 'exito');
-    setTimeout(() => { renderContenidoImp(); }, 1500);
-  } catch(e) {
+    setTimeout(function(){ renderContenidoImp(); }, 1500);
+  }).catch(function(e) {
     console.error(e);
     mostrarToast('Error al guardar. Intenta de nuevo.', 'error');
     btn.disabled = false; btn.textContent = 'Registrar Salida ✓';
-  }
-};
+  });
+}
 
 // ===== PANEL ADMIN =====
 function mostrarPantallaAdmin() {
@@ -1302,195 +1439,243 @@ function mostrarPantallaAdmin() {
   actualizarFechaAdmin();
   timerAdmin = setInterval(actualizarFechaAdmin, 30000);
 
-  // Poblar filtro impulsadoras
-  const sel = document.getElementById('filtro-imp');
-  Object.values(IMPULSADORAS).forEach(imp => {
-    const opt = document.createElement('option');
+  var sel = document.getElementById('filtro-imp');
+  Object.values(IMPULSADORAS).forEach(function(imp){
+    var opt = document.createElement('option');
     opt.value = imp.nombre;
     opt.textContent = imp.nombre.split(' ').slice(0,2).join(' ');
     sel.appendChild(opt);
   });
 
-  // Fecha default
   document.getElementById('filtro-fecha').value = hoy();
-
   iniciarTiempoReal();
   cargarHistorial();
 }
 
 function actualizarFechaAdmin() {
-  const d = new Date();
+  var d = new Date();
   document.getElementById('admin-fecha-hora').textContent =
     d.toLocaleString('es-CO', { dateStyle: 'full', timeStyle: 'short' });
 }
 
-window.adminTab = function(tab) {
-  document.querySelectorAll('.admin-tab').forEach((t, i) => {
-    t.classList.toggle('activo', (tab === 'tiempo-real' && i === 0) || (tab === 'historial' && i === 1));
+function adminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(function(t, i){
+    t.classList.toggle('activo',
+      (tab === 'tiempo-real' && i === 0) ||
+      (tab === 'historial' && i === 1) ||
+      (tab === 'json' && i === 2)
+    );
   });
   document.getElementById('admin-tiempo-real').style.display = tab === 'tiempo-real' ? '' : 'none';
   document.getElementById('admin-historial').style.display = tab === 'historial' ? '' : 'none';
-};
+  document.getElementById('admin-json').style.display = tab === 'json' ? '' : 'none';
+  if (tab === 'historial') cargarHistorial();
+  if (tab === 'json') verificarFirebase();
+}
+
+function guardarJSON() {
+  var ruta = document.getElementById('json-ruta').value.trim();
+  var texto = document.getElementById('json-input').value.trim();
+  var resultado = document.getElementById('json-resultado');
+  var resultadoTexto = document.getElementById('json-resultado-texto');
+  var resultadoLabel = document.getElementById('json-resultado-label');
+  if (!ruta) { mostrarToast('Escribe la ruta primero', 'error'); return; }
+  if (!texto) { mostrarToast('El JSON está vacío', 'error'); return; }
+  var datos;
+  try { datos = JSON.parse(texto); } catch(e) { mostrarToast('JSON inválido: ' + e.message, 'error'); return; }
+  db.ref(ruta).set(datos).then(function(){
+    mostrarToast('✓ Guardado en Firebase', 'exito');
+    resultado.style.display = '';
+    resultadoLabel.textContent = '✓ GUARDADO EXITOSAMENTE';
+    resultadoTexto.textContent = 'Ruta: ' + ruta + '\n\n' + JSON.stringify(datos, null, 2);
+  }).catch(function(e){
+    mostrarToast('Error al guardar', 'error');
+    resultado.style.display = '';
+    resultadoLabel.textContent = '✗ ERROR';
+    resultadoTexto.textContent = e.message;
+  });
+}
+
+function leerJSON() {
+  var ruta = document.getElementById('json-ruta').value.trim();
+  var resultado = document.getElementById('json-resultado');
+  var resultadoTexto = document.getElementById('json-resultado-texto');
+  var resultadoLabel = document.getElementById('json-resultado-label');
+  if (!ruta) { mostrarToast('Escribe la ruta primero', 'error'); return; }
+  resultado.style.display = '';
+  resultadoLabel.textContent = 'LEYENDO...';
+  resultadoTexto.textContent = '⏳';
+  db.ref(ruta).get().then(function(snap){
+    resultadoLabel.textContent = '📄 RESULTADO — ' + ruta;
+    if (!snap.exists()) {
+      resultadoTexto.textContent = '(vacío — la ruta no existe aún)';
+    } else {
+      resultadoTexto.textContent = JSON.stringify(snap.val(), null, 2);
+    }
+  }).catch(function(e){
+    resultadoLabel.textContent = '✗ ERROR';
+    resultadoTexto.textContent = e.message;
+  });
+}
+
+function limpiarJSON() {
+  document.getElementById('json-ruta').value = '';
+  document.getElementById('json-input').value = '';
+  document.getElementById('json-resultado').style.display = 'none';
+  document.getElementById('json-resultado-texto').textContent = '';
+}
+
+function accionRapida(ruta) {
+  document.getElementById('json-ruta').value = ruta;
+  document.getElementById('json-input').value = '';
+  leerJSON();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function verificarFirebase() {
+  var badge = document.getElementById('cfg-fb-status');
+  db.ref('.info/connected').get().then(function(snap){
+    if (snap.val() === true || snap.exists()) {
+      badge.className = 'cfg-badge cfg-badge-ok';
+      badge.textContent = '✓ Firebase conectado';
+    } else {
+      // intento de ping real
+      db.ref('sammy/.ping').set(Date.now()).then(function(){
+        badge.className = 'cfg-badge cfg-badge-ok';
+        badge.textContent = '✓ Firebase conectado';
+      }).catch(function(){
+        badge.className = 'cfg-badge cfg-badge-error';
+        badge.textContent = '✗ Sin conexión a Firebase';
+      });
+    }
+  }).catch(function(){
+    badge.className = 'cfg-badge cfg-badge-error';
+    badge.textContent = '✗ Error de conexión';
+  });
+}
 
 function iniciarTiempoReal() {
-  const activosRef = ref(db, 'sammy/registros_activos');
-  onValue(activosRef, snap => {
-    const activos = snap.val() || {};
-    renderTiempoReal(activos);
+  db.ref('sammy/registros_activos').on('value', function(snap){
+    renderTiempoReal(snap.val() || {});
   });
 }
 
 function renderTiempoReal(activos) {
-  const lista = document.getElementById('lista-tiempo-real');
-  const totalImp = Object.keys(IMPULSADORAS).length;
-  const enPunto = Object.keys(activos).length;
-  const activasHoy = enPunto; // simplificado
-
-  document.getElementById('stat-activas').textContent = activasHoy;
+  var lista = document.getElementById('lista-tiempo-real');
+  var enPunto = Object.keys(activos).length;
+  document.getElementById('stat-activas').textContent = enPunto;
   document.getElementById('stat-en-punto').textContent = enPunto;
-  document.getElementById('stat-total').textContent = totalImp;
+  document.getElementById('stat-total').textContent = Object.keys(IMPULSADORAS).length;
 
-  let html = '';
-
-  // Primero las activas
-  Object.values(activos).forEach(r => {
-    const mins = Math.floor((Date.now() - r.tsEntrada) / 60000);
-    const hrs = Math.floor(mins / 60);
-    const minR = mins % 60;
-    const tiempo = hrs > 0 ? `${hrs}h ${minR}m en punto` : `${mins}m en punto`;
-    html += `
-      <div class="imp-card en-punto">
-        <div class="imp-avatar">${iniciales(r.nombre)}</div>
-        <div class="imp-info">
-          <div class="imp-nombre">${r.nombre}</div>
-          <div class="imp-detalle">${r.punto.tienda} · ${r.punto.ciudad}</div>
-          <div class="imp-tiempo">⦿ ${tiempo} · Entró ${r.horaEntrada}</div>
-        </div>
-      </div>
-    `;
+  var html = '';
+  Object.values(activos).forEach(function(r){
+    var mins = Math.floor((Date.now() - r.tsEntrada) / 60000);
+    var hrs = Math.floor(mins / 60);
+    var minR = mins % 60;
+    var tiempo = hrs > 0 ? hrs + 'h ' + minR + 'm en punto' : mins + 'm en punto';
+    html += '<div class="imp-card en-punto">' +
+      '<div class="imp-avatar">' + iniciales(r.nombre) + '</div>' +
+      '<div class="imp-info">' +
+        '<div class="imp-nombre">' + r.nombre + '</div>' +
+        '<div class="imp-detalle">' + r.punto.tienda + ' · ' + r.punto.ciudad + '</div>' +
+        '<div class="imp-tiempo">⦿ ' + tiempo + ' · Entró ' + r.horaEntrada + '</div>' +
+      '</div></div>';
   });
 
-  // Luego las libres
-  const cedulasActivas = Object.keys(activos);
-  Object.entries(IMPULSADORAS).forEach(([ced, imp]) => {
+  var cedulasActivas = Object.keys(activos);
+  Object.entries(IMPULSADORAS).forEach(function(entry){
+    var ced = entry[0], imp = entry[1];
     if (!cedulasActivas.includes(ced)) {
-      html += `
-        <div class="imp-card libre">
-          <div class="imp-avatar" style="background: linear-gradient(135deg,#E0D0D5,#C8B0B8)">${iniciales(imp.nombre)}</div>
-          <div class="imp-info">
-            <div class="imp-nombre">${imp.nombre}</div>
-            <div class="imp-detalle">${imp.ciudad}</div>
-            <div style="font-size:0.75rem;color:var(--texto-suave)">Sin registro hoy</div>
-          </div>
-        </div>
-      `;
+      html += '<div class="imp-card libre">' +
+        '<div class="imp-avatar" style="background:linear-gradient(135deg,#E0D0D5,#C8B0B8)">' + iniciales(imp.nombre) + '</div>' +
+        '<div class="imp-info">' +
+          '<div class="imp-nombre">' + imp.nombre + '</div>' +
+          '<div class="imp-detalle">' + imp.ciudad + '</div>' +
+          '<div style="font-size:0.75rem;color:var(--texto-suave)">Sin registro hoy</div>' +
+        '</div></div>';
     }
   });
-
   lista.innerHTML = html;
 }
 
-window.cargarHistorial = async function() {
-  const lista = document.getElementById('lista-historial');
+function cargarHistorial() {
+  var lista = document.getElementById('lista-historial');
   lista.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
 
-  const fecha = document.getElementById('filtro-fecha').value || hoy();
-  const impFiltro = document.getElementById('filtro-imp').value;
-  const ciudadFiltro = document.getElementById('filtro-ciudad').value;
+  var fecha = document.getElementById('filtro-fecha').value || hoy();
+  var impFiltro = document.getElementById('filtro-imp').value;
+  var ciudadFiltro = document.getElementById('filtro-ciudad').value;
 
-  try {
-    const snap = await get(ref(db, `sammy/historial/${fecha}`));
+  db.ref('sammy/historial/' + fecha).get().then(function(snap){
     if (!snap.exists()) {
       lista.innerHTML = '<div class="empty-state"><div class="icono">📭</div><p>Sin registros para esta fecha</p></div>';
       return;
     }
-
-    let registros = Object.values(snap.val());
-
-    if (impFiltro) registros = registros.filter(r => r.nombre === impFiltro);
-    if (ciudadFiltro) registros = registros.filter(r => r.punto?.ciudad === ciudadFiltro || r.ciudadBase === ciudadFiltro);
-
-    registros.sort((a, b) => b.tsEntrada - a.tsEntrada);
+    var registros = Object.values(snap.val());
+    if (impFiltro) registros = registros.filter(function(r){ return r.nombre === impFiltro; });
+    if (ciudadFiltro) registros = registros.filter(function(r){ return r.punto && r.punto.ciudad === ciudadFiltro; });
+    registros.sort(function(a,b){ return b.tsEntrada - a.tsEntrada; });
 
     if (!registros.length) {
       lista.innerHTML = '<div class="empty-state"><div class="icono">🔍</div><p>Sin registros con estos filtros</p></div>';
       return;
     }
 
-    lista.innerHTML = registros.map(r => {
-      const estadoClass = r.estadoExhibicion === 'Bien' ? 'verde' : r.estadoExhibicion === 'Regular' ? 'naranja' : 'rojo';
-      const completadoBadge = r.completado
+    lista.innerHTML = registros.map(function(r){
+      var estadoClass = r.estadoExhibicion === 'Bien' ? 'verde' : r.estadoExhibicion === 'Regular' ? 'naranja' : 'rojo';
+      var badge = r.completado
         ? '<span class="completado-badge">✓ Completo</span>'
         : '<span class="pendiente-badge">⦿ En punto</span>';
 
-      const fotos = [
+      var fotos = [
         { url: r.fotoImpEntrada, label: '🤳' },
         { url: r.fotoPuntoEntrada, label: '🏪' },
         { url: r.fotoImpSalida, label: '👋' },
         { url: r.fotoPuntoSalida, label: '🏁' }
       ];
+      var fotosHtml = fotos.map(function(f){
+        return f.url
+          ? '<img class="foto-thumb" src="' + f.url + '" onclick="abrirFoto(\'' + f.url + '\')">'
+          : '<div class="foto-placeholder">' + f.label + '</div>';
+      }).join('');
 
-      const fotosHtml = fotos.map(f => f.url
-        ? `<img class="foto-thumb" src="${f.url}" onclick="abrirFoto('${f.url}')" title="${f.label}">`
-        : `<div class="foto-placeholder">${f.label}</div>`
-      ).join('');
+      var extras = '';
+      if (r.agotados) extras += '<div class="reg-dato" style="grid-column:span 2"><div class="reg-dato-label">Agotados</div><div class="reg-dato-val rojo">' + r.agotados + '</div></div>';
+      if (r.sobrestock) extras += '<div class="reg-dato" style="grid-column:span 2"><div class="reg-dato-label">Sobrestock</div><div class="reg-dato-val naranja">' + r.sobrestock + '</div></div>';
+      if (r.productoMasVendido) extras += '<div class="reg-dato" style="grid-column:span 2"><div class="reg-dato-label">Producto más vendido</div><div class="reg-dato-val">' + r.productoMasVendido + '</div></div>';
 
-      return `
-        <div class="registro-card">
-          <div class="reg-header">
-            <div>
-              <div class="reg-nombre">${r.nombre}</div>
-              <div class="reg-fecha">${r.punto?.tienda} · ${r.punto?.ciudad}</div>
-            </div>
-            <div style="text-align:right">
-              ${completadoBadge}
-              <div class="reg-fecha" style="margin-top:4px">${r.horaEntrada}${r.horaSalida ? ' → ' + r.horaSalida : ''}</div>
-            </div>
-          </div>
-          <div class="reg-datos">
-            <div class="reg-dato">
-              <div class="reg-dato-label">Exhibición al llegar</div>
-              <div class="reg-dato-val ${estadoClass}">${r.estadoExhibicion || '—'}</div>
-            </div>
-            <div class="reg-dato">
-              <div class="reg-dato-label">Ventas del día</div>
-              <div class="reg-dato-val">${formatPesos(r.ventas)}</div>
-            </div>
-            ${r.agotados ? `<div class="reg-dato" style="grid-column:span 2">
-              <div class="reg-dato-label">Agotados</div>
-              <div class="reg-dato-val rojo">${r.agotados}</div>
-            </div>` : ''}
-            ${r.sobrestock ? `<div class="reg-dato" style="grid-column:span 2">
-              <div class="reg-dato-label">Sobrestock</div>
-              <div class="reg-dato-val naranja">${r.sobrestock}</div>
-            </div>` : ''}
-            ${r.productoMasVendido ? `<div class="reg-dato" style="grid-column:span 2">
-              <div class="reg-dato-label">Producto más vendido</div>
-              <div class="reg-dato-val">${r.productoMasVendido}</div>
-            </div>` : ''}
-          </div>
-          <div class="fotos-grid">${fotosHtml}</div>
-        </div>
-      `;
+      return '<div class="registro-card">' +
+        '<div class="reg-header">' +
+          '<div><div class="reg-nombre">' + r.nombre + '</div>' +
+          '<div class="reg-fecha">' + (r.punto ? r.punto.tienda + ' · ' + r.punto.ciudad : '') + '</div></div>' +
+          '<div style="text-align:right">' + badge +
+          '<div class="reg-fecha" style="margin-top:4px">' + r.horaEntrada + (r.horaSalida ? ' → ' + r.horaSalida : '') + '</div></div>' +
+        '</div>' +
+        '<div class="reg-datos">' +
+          '<div class="reg-dato"><div class="reg-dato-label">Exhibición al llegar</div><div class="reg-dato-val ' + estadoClass + '">' + (r.estadoExhibicion || '—') + '</div></div>' +
+          '<div class="reg-dato"><div class="reg-dato-label">Ventas del día</div><div class="reg-dato-val">' + formatPesos(r.ventas) + '</div></div>' +
+          extras +
+        '</div>' +
+        '<div class="fotos-grid">' + fotosHtml + '</div>' +
+      '</div>';
     }).join('');
-
-  } catch(e) {
+  }).catch(function(e){
     console.error(e);
-    lista.innerHTML = '<div class="empty-state"><div class="icono">⚠️</div><p>Error al cargar. Intenta de nuevo.</p></div>';
-  }
-};
+    lista.innerHTML = '<div class="empty-state"><div class="icono">⚠️</div><p>Error al cargar. Revisa las reglas de Firebase.</p></div>';
+  });
+}
 
-window.abrirFoto = function(url) {
+function abrirFoto(url) {
   document.getElementById('modal-img').src = url;
   document.getElementById('modal-foto').classList.add('abierto');
-};
-window.cerrarModal = function() {
+}
+function cerrarModal() {
   document.getElementById('modal-foto').classList.remove('abierto');
-};
+}
 
-// Enter en inputs
-document.getElementById('cedula-input').addEventListener('keydown', e => { if (e.key === 'Enter') window.loginImpulsadora(); });
-document.getElementById('admin-pass').addEventListener('keydown', e => { if (e.key === 'Enter') window.loginAdmin(); });
+// Enter listeners
+document.getElementById('cedula-input').addEventListener('keydown', function(e){ if(e.key==='Enter') loginImpulsadora(); });
+document.getElementById('admin-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') loginAdmin(); });
 </script>
 </body>
 </html>
