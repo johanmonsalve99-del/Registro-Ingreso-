@@ -7,19 +7,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --rosa: #E8547A;
-  --rosa-claro: #F7A8BB;
-  --rosa-oscuro: #C0395C;
-  --crema: #FDF6F0;
-  --crema2: #FAE8E0;
-  --dorado: #C9965A;
+  --rosa: #9B7FD4;
+  --rosa-claro: #C9B8EC;
+  --rosa-oscuro: #7356B6;
+  --crema: #F5F2FF;
+  --crema2: #EAE4F7;
+  --dorado: #B8A0E0;
   --texto: #2A1A1F;
   --texto-suave: #7A5460;
   --blanco: #FFFFFF;
   --verde: #4CAF82;
   --naranja: #E8854A;
   --rojo: #D94040;
-  --sombra: 0 4px 24px rgba(232,84,122,0.12);
+  --sombra: 0 4px 24px rgba(155,127,212,0.12);
   --sombra2: 0 2px 12px rgba(42,26,31,0.10);
 }
 
@@ -47,7 +47,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 12px rgba(232,84,122,0.08);
+  box-shadow: 0 2px 12px rgba(155,127,212,0.08);
 }
 .logo {
   font-family: 'Playfair Display', serif;
@@ -72,7 +72,7 @@ body {
 
 /* ===================== LOGIN ===================== */
 #pantalla-login {
-  background: linear-gradient(135deg, #FDF6F0 0%, #FAE8E0 50%, #F7C5D0 100%);
+  background: linear-gradient(135deg, #F0ECFF 0%, #E4DAF7 50%, #D4C5F0 100%);
   justify-content: center;
   align-items: center;
   padding: 20px;
@@ -83,7 +83,7 @@ body {
   padding: 40px 36px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 20px 60px rgba(232,84,122,0.18);
+  box-shadow: 0 20px 60px rgba(155,127,212,0.18);
   text-align: center;
 }
 .login-logo {
@@ -124,7 +124,7 @@ body {
 .login-tab.activo {
   background: white;
   color: var(--rosa);
-  box-shadow: 0 2px 8px rgba(232,84,122,0.15);
+  box-shadow: 0 2px 8px rgba(155,127,212,0.15);
 }
 .campo {
   margin-bottom: 16px;
@@ -172,7 +172,7 @@ body {
   letter-spacing: 0.5px;
   margin-top: 4px;
 }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,84,122,0.35); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(155,127,212,0.35); }
 .btn-primary:active { transform: translateY(0); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
@@ -232,8 +232,8 @@ body {
   align-items: center;
   justify-content: space-between;
 }
-.punto-item:hover { border-color: var(--rosa-claro); background: #FFF5F7; }
-.punto-item.seleccionado { border-color: var(--rosa); background: #FFF5F7; }
+.punto-item:hover { border-color: var(--rosa-claro); background: #F5F2FF; }
+.punto-item.seleccionado { border-color: var(--rosa); background: #F5F2FF; }
 .punto-nombre { font-weight: 500; font-size: 0.92rem; }
 .punto-cadena {
   font-size: 0.75rem;
@@ -293,7 +293,7 @@ body {
   overflow: hidden;
   margin-bottom: 12px;
 }
-.foto-upload:hover { border-color: var(--rosa); background: #FFF5F7; }
+.foto-upload:hover { border-color: var(--rosa); background: #F5F2FF; }
 .foto-upload input[type="file"] {
   position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0;
 }
@@ -424,6 +424,84 @@ body {
 .admin-contenido { padding: 20px; }
 pre { margin: 0; }
 
+/* ===== PASOS ===== */
+.paso-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--crema2);
+}
+.paso-numero {
+  background: linear-gradient(135deg, var(--rosa), var(--rosa-oscuro));
+  color: white;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 5px 11px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.obligatorio { color: var(--rosa); font-size: 0.85em; }
+
+/* STEPPER */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 18px 20px 4px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+.step-circulo {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--crema2);
+  color: var(--texto-suave);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem;
+  border: 2px solid var(--crema2);
+  transition: all 0.3s;
+  z-index: 1;
+}
+.step-circulo.activo {
+  background: linear-gradient(135deg, var(--rosa), var(--rosa-oscuro));
+  color: white;
+  border-color: var(--rosa-oscuro);
+  box-shadow: 0 0 0 4px rgba(155,127,212,0.2);
+}
+.step-circulo.hecho {
+  background: var(--verde);
+  color: white;
+  border-color: var(--verde);
+}
+.step-label {
+  font-size: 0.65rem;
+  color: var(--texto-suave);
+  margin-top: 5px;
+  text-align: center;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.step-label.activo { color: var(--rosa); font-weight: 700; }
+.step-label.hecho { color: var(--verde); }
+.step-linea {
+  height: 2px;
+  flex: 1;
+  background: var(--crema2);
+  margin-bottom: 18px;
+  transition: background 0.3s;
+}
+.step-linea.hecha { background: var(--verde); }
+
 /* ===== CONFIG / JSON ===== */
 .cfg-card {
   background: white;
@@ -460,8 +538,8 @@ pre { margin: 0; }
 .cfg-badge-error { background: #FEE; color: var(--rojo); border: 1.5px solid var(--rojo); }
 .cfg-badge-checking { background: var(--crema2); color: var(--texto-suave); border: 1.5px solid var(--crema2); }
 .cfg-mono-box {
-  background: #1E1218;
-  color: #F7C5D0;
+  background: #1A1528;
+  color: #D4C5F0;
   border-radius: 10px;
   padding: 12px 14px;
   font-family: monospace;
@@ -518,7 +596,7 @@ pre { margin: 0; }
   text-align: left;
   transition: all 0.2s;
 }
-.cfg-btn-ghost:hover { border-color: var(--rosa-claro); background: #FFF5F7; color: var(--rosa); }
+.cfg-btn-ghost:hover { border-color: var(--rosa-claro); background: #F5F2FF; color: var(--rosa); }
 
 /* TIEMPO REAL */
 .stats-grid {
@@ -833,6 +911,7 @@ pre { margin: 0; }
   <div class="admin-header">
     <h2>Panel Administrativo</h2>
     <p id="admin-fecha-hora"></p>
+    <p id="admin-countdown" style="font-size:0.75rem;opacity:0.5;margin-top:2px">Actualiza en 300s</p>
   </div>
 
   <div class="admin-tabs">
@@ -1215,26 +1294,21 @@ function crearInputFoto(idInput, idPreview, idUpload, icono, texto) {
   var wrap = document.createElement('div');
   wrap.className = 'foto-upload';
   wrap.id = idUpload;
-
   var input = document.createElement('input');
   input.type = 'file';
   input.id = idInput;
   input.accept = 'image/*';
   input.capture = 'environment';
   input.style.cssText = 'position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0';
-
   var icoDiv = document.createElement('div');
   icoDiv.className = 'icono';
   icoDiv.textContent = icono;
-
   var p = document.createElement('p');
   p.id = 'txt-' + idInput;
   p.textContent = texto;
-
   var prev = document.createElement('img');
   prev.className = 'foto-preview';
   prev.id = idPreview;
-
   input.addEventListener('change', function() {
     var file = this.files[0];
     if (!file) return;
@@ -1246,10 +1320,9 @@ function crearInputFoto(idInput, idPreview, idUpload, icono, texto) {
       p.textContent = '✓ Foto lista';
       fotosData[idInput] = e.target.result;
     };
-    reader.onerror = function() { mostrarToast('Error leyendo foto', 'error'); };
+    reader.onerror = function() { mostrarToast('Error al leer la foto', 'error'); };
     reader.readAsDataURL(file);
   });
-
   wrap.appendChild(input);
   wrap.appendChild(icoDiv);
   wrap.appendChild(p);
@@ -1257,153 +1330,57 @@ function crearInputFoto(idInput, idPreview, idUpload, icono, texto) {
   return wrap;
 }
 
+function renderStepper(pasoActivo) {
+  var pasos = [
+    { num: 1, label: 'Llegada' },
+    { num: 2, label: 'Estado\ndel punto' },
+    { num: 3, label: 'Salida' }
+  ];
+  var div = document.createElement('div');
+  div.className = 'stepper';
+  pasos.forEach(function(p, i) {
+    var item = document.createElement('div');
+    item.className = 'step-item';
+    var circ = document.createElement('div');
+    circ.className = 'step-circulo' + (p.num < pasoActivo ? ' hecho' : p.num === pasoActivo ? ' activo' : '');
+    circ.textContent = p.num < pasoActivo ? '✓' : p.num;
+    var label = document.createElement('div');
+    label.className = 'step-label' + (p.num < pasoActivo ? ' hecho' : p.num === pasoActivo ? ' activo' : '');
+    label.textContent = p.label;
+    item.appendChild(circ);
+    item.appendChild(label);
+    div.appendChild(item);
+    if (i < pasos.length - 1) {
+      var linea = document.createElement('div');
+      linea.className = 'step-linea' + (p.num < pasoActivo ? ' hecha' : '');
+      div.appendChild(linea);
+    }
+  });
+  return div;
+}
+
+var pasoActual = 0;
+
 function renderContenidoImp() {
   var cont = document.getElementById('contenido-imp');
   cont.innerHTML = '';
-
-  if (registroActivo) {
-    var punto = registroActivo.punto;
-
-    // Resumen activa
-    var resumen = document.createElement('div');
-    resumen.className = 'resumen-activa';
-    resumen.innerHTML = '<h3>⦿ Actualmente en punto</h3>' +
-      '<div class="resumen-row"><span>Tienda</span><span>' + punto.tienda + '</span></div>' +
-      '<div class="resumen-row"><span>Cadena</span><span>' + punto.cadena + '</span></div>' +
-      '<div class="resumen-row"><span>Ciudad</span><span>' + punto.ciudad + '</span></div>' +
-      '<div class="resumen-row"><span>Hora entrada</span><span>' + registroActivo.horaEntrada + '</span></div>' +
-      '<div class="resumen-row"><span>Estado exhibición</span><span>' + (registroActivo.estadoExhibicion || '—') + '</span></div>';
-    cont.appendChild(resumen);
-
-    // Form salida
-    var form = document.createElement('div');
-    form.className = 'form-section';
-    form.innerHTML = '<h3>📸 Registro de Salida</h3>';
-
-    // Foto impulsadora salida
-    var c1 = document.createElement('div'); c1.className = 'campo';
-    var l1 = document.createElement('label'); l1.textContent = 'Foto de ti (al salir)';
-    c1.appendChild(l1);
-    c1.appendChild(crearInputFoto('foto-salida-imp', 'prev-salida-imp', 'fu-salida-imp', '🤳', 'Tomar foto'));
-    form.appendChild(c1);
-
-    // Foto punto salida
-    var c2 = document.createElement('div'); c2.className = 'campo';
-    var l2 = document.createElement('label'); l2.textContent = 'Foto del punto (cómo lo dejas)';
-    c2.appendChild(l2);
-    c2.appendChild(crearInputFoto('foto-salida-punto', 'prev-salida-punto', 'fu-salida-punto', '🏪', 'Foto del punto'));
-    form.appendChild(c2);
-
-    // Ventas
-    var c3 = document.createElement('div'); c3.className = 'campo';
-    c3.innerHTML = '<label>Ventas del día (total)</label><div class="campo-pesos"><input type="number" id="ventas-input" placeholder="0" inputmode="numeric"></div>';
-    form.appendChild(c3);
-
-    // Producto más vendido
-    var c4 = document.createElement('div'); c4.className = 'campo';
-    c4.innerHTML = '<label>Producto más vendido</label><input type="text" id="producto-mas-vendido" placeholder="Ej: Base líquida tono 3...">';
-    form.appendChild(c4);
-
-    // Botón
-    var btn = document.createElement('button');
-    btn.className = 'btn-primary';
-    btn.textContent = 'Registrar Salida ✓';
-    btn.onclick = registrarSalida;
-    form.appendChild(btn);
-
-    cont.appendChild(form);
-
+  if (!registroActivo) {
+    pasoActual = 1;
+    cont.appendChild(renderStepper(1));
+    renderPaso0(cont);
+  } else if (!registroActivo.paso2completado) {
+    pasoActual = 2;
+    cont.appendChild(renderStepper(2));
+    renderPaso2(cont);
   } else {
-    // Lista de puntos
-    var estadoCard = document.createElement('div');
-    estadoCard.className = 'estado-card';
-    estadoCard.innerHTML = '<h3>Tu estado hoy</h3><span class="badge-estado badge-libre"><span class="badge-dot"></span> Disponible</span>';
-    cont.appendChild(estadoCard);
-
-    var secPuntos = document.createElement('div');
-    secPuntos.className = 'form-section';
-    secPuntos.innerHTML = '<h3>📍 Selecciona el punto de hoy</h3>';
-    var lista = document.createElement('div');
-    lista.className = 'puntos-lista';
-    usuarioActual.puntos.forEach(function(p) {
-      var item = document.createElement('div');
-      item.className = 'punto-item';
-      item.innerHTML = '<div><div class="punto-nombre">' + p.tienda + '</div><div style="font-size:0.75rem;color:var(--texto-suave);margin-top:2px">' + p.dias + '</div></div><span class="punto-cadena">' + p.ciudad + '</span>';
-      item.addEventListener('click', function() {
-        puntoSeleccionado = p;
-        document.querySelectorAll('.punto-item').forEach(function(el){ el.classList.remove('seleccionado'); });
-        item.classList.add('seleccionado');
-        var fe = document.getElementById('form-entrada');
-        fe.style.display = '';
-        fe.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-      lista.appendChild(item);
-    });
-    secPuntos.appendChild(lista);
-    cont.appendChild(secPuntos);
-
-    // Form entrada (oculto inicialmente)
-    var formEntrada = document.createElement('div');
-    formEntrada.id = 'form-entrada';
-    formEntrada.style.display = 'none';
-
-    var secEntrada = document.createElement('div');
-    secEntrada.className = 'form-section';
-    secEntrada.innerHTML = '<h3>📸 Registro de Entrada</h3>';
-
-    // Foto impulsadora entrada
-    var e1 = document.createElement('div'); e1.className = 'campo';
-    var el1 = document.createElement('label'); el1.textContent = 'Foto de ti (al llegar)';
-    e1.appendChild(el1);
-    e1.appendChild(crearInputFoto('foto-entrada-imp', 'prev-entrada-imp', 'fu-entrada-imp', '🤳', 'Tomar foto'));
-    secEntrada.appendChild(e1);
-
-    // Foto punto entrada
-    var e2 = document.createElement('div'); e2.className = 'campo';
-    var el2 = document.createElement('label'); el2.textContent = 'Foto del punto (cómo lo encuentras)';
-    e2.appendChild(el2);
-    e2.appendChild(crearInputFoto('foto-entrada-punto', 'prev-entrada-punto', 'fu-entrada-punto', '🏪', 'Foto del punto'));
-    secEntrada.appendChild(e2);
-
-    // Estado exhibición
-    var e3 = document.createElement('div'); e3.className = 'campo';
-    e3.innerHTML = '<label>Estado de la exhibición al llegar</label>' +
-      '<div class="opciones-estado">' +
-        '<div class="opcion-estado bien" onclick="selEstado(this,\'Bien\')">👍 Bien</div>' +
-        '<div class="opcion-estado regular" onclick="selEstado(this,\'Regular\')">😐 Regular</div>' +
-        '<div class="opcion-estado mal" onclick="selEstado(this,\'Mal\')">👎 Mal</div>' +
-      '</div>';
-    secEntrada.appendChild(e3);
-
-    // Agotados
-    var e4 = document.createElement('div'); e4.className = 'campo';
-    e4.innerHTML = '<label>Productos agotados</label><textarea id="agotados-input" placeholder="Escribe los productos agotados..."></textarea>';
-    secEntrada.appendChild(e4);
-
-    // Sobrestock
-    var e5 = document.createElement('div'); e5.className = 'campo';
-    e5.innerHTML = '<label>Sobrestock</label><textarea id="sobrestock-input" placeholder="Escribe los productos con sobrestock..."></textarea>';
-    secEntrada.appendChild(e5);
-
-    // Botón entrada
-    var btnEntrada = document.createElement('button');
-    btnEntrada.className = 'btn-primary';
-    btnEntrada.textContent = 'Registrar Entrada ✓';
-    btnEntrada.onclick = registrarEntrada;
-    secEntrada.appendChild(btnEntrada);
-
-    formEntrada.appendChild(secEntrada);
-    cont.appendChild(formEntrada);
+    pasoActual = 3;
+    cont.appendChild(renderStepper(3));
+    renderPaso3(cont);
   }
 }
 
-function seleccionarPunto(id) {
-  puntoSeleccionado = usuarioActual.puntos.find(function(p){ return p.id === id; });
-  document.querySelectorAll('.punto-item').forEach(function(el){ el.classList.remove('seleccionado'); });
-  event.currentTarget.classList.add('seleccionado');
-  var fe = document.getElementById('form-entrada');
-  fe.style.display = '';
-  fe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function pasoHeader(num, titulo) {
+  return '<div class="paso-header"><div class="paso-numero">' + num + '/3</div><h3 style="margin:0;color:var(--rosa)">' + titulo + '</h3></div>';
 }
 
 function selEstado(el, val) {
@@ -1412,58 +1389,155 @@ function selEstado(el, val) {
   el.classList.add('sel');
 }
 
+// PASO 0: seleccionar punto
+function renderPaso0(cont) {
+  var estadoCard = document.createElement('div');
+  estadoCard.className = 'estado-card';
+  estadoCard.innerHTML = '<h3>Tu estado hoy</h3><span class="badge-estado badge-libre"><span class="badge-dot"></span> Disponible</span>';
+  cont.appendChild(estadoCard);
 
-// Comprime foto a max 400px, 40% calidad (~30-60KB)
-function comprimirFoto(base64) {
-  return new Promise(function(resolve) {
-    if (!base64) { resolve(''); return; }
-    try {
-      var img = new Image();
-      img.onload = function() {
-        try {
-          var MAX = 400;
-          var w = img.width, h = img.height;
-          var ratio = Math.min(MAX / w, MAX / h, 1);
-          w = Math.round(w * ratio);
-          h = Math.round(h * ratio);
-          var canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          var result = canvas.toDataURL('image/jpeg', 0.4);
-          resolve(result);
-        } catch(e) {
-          console.error('canvas error:', e);
-          resolve('');
-        }
-      };
-      img.onerror = function() {
-        console.error('img load error');
-        resolve('');
-      };
-      img.src = base64;
-    } catch(e) {
-      console.error('comprimirFoto error:', e);
-      resolve('');
-    }
+  var secPuntos = document.createElement('div');
+  secPuntos.className = 'form-section';
+  secPuntos.innerHTML = '<h3>📍 Selecciona el punto de hoy</h3>';
+  var lista = document.createElement('div');
+  lista.className = 'puntos-lista';
+  usuarioActual.puntos.forEach(function(p) {
+    var item = document.createElement('div');
+    item.className = 'punto-item';
+    item.innerHTML = '<div><div class="punto-nombre">' + p.tienda + '</div><div style="font-size:0.75rem;color:var(--texto-suave);margin-top:2px">' + p.dias + '</div></div><span class="punto-cadena">' + p.ciudad + '</span>';
+    item.addEventListener('click', function() {
+      puntoSeleccionado = p;
+      document.querySelectorAll('.punto-item').forEach(function(el){ el.classList.remove('seleccionado'); });
+      item.classList.add('seleccionado');
+      var fe = document.getElementById('form-paso1');
+      fe.style.display = '';
+      fe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    lista.appendChild(item);
   });
+  secPuntos.appendChild(lista);
+  cont.appendChild(secPuntos);
+
+  var formPaso1 = document.createElement('div');
+  formPaso1.id = 'form-paso1';
+  formPaso1.style.display = 'none';
+  renderPaso1Form(formPaso1);
+  cont.appendChild(formPaso1);
 }
 
-function registrarEntrada() {
+// PASO 1: llegada
+function renderPaso1Form(contenedor) {
+  var sec = document.createElement('div');
+  sec.className = 'form-section';
+  sec.innerHTML = pasoHeader(1, 'Registro de Llegada');
+
+  var c1 = document.createElement('div'); c1.className = 'campo';
+  c1.innerHTML = '<label>📸 Foto de ti al llegar <span class="obligatorio">*</span></label>';
+  c1.appendChild(crearInputFoto('foto-entrada-imp','prev-entrada-imp','fu-entrada-imp','🤳','Tomar foto'));
+  sec.appendChild(c1);
+
+  var c2 = document.createElement('div'); c2.className = 'campo';
+  c2.innerHTML = '<label>📸 Cómo encuentras la exhibición <span class="obligatorio">*</span></label>';
+  c2.appendChild(crearInputFoto('foto-entrada-punto','prev-entrada-punto','fu-entrada-punto','🏪','Foto de la exhibición'));
+  sec.appendChild(c2);
+
+  var c3 = document.createElement('div'); c3.className = 'campo';
+  c3.innerHTML = '<label>Estado de la exhibición <span class="obligatorio">*</span></label>' +
+    '<div class="opciones-estado">' +
+      '<div class="opcion-estado bien" onclick="selEstado(this,\'Bien\')">👍 Bien</div>' +
+      '<div class="opcion-estado regular" onclick="selEstado(this,\'Regular\')">😐 Regular</div>' +
+      '<div class="opcion-estado mal" onclick="selEstado(this,\'Mal\')">👎 Mal</div>' +
+    '</div>';
+  sec.appendChild(c3);
+
+  var btn = document.createElement('button');
+  btn.className = 'btn-primary'; btn.textContent = 'Continuar al Paso 2 →';
+  btn.onclick = guardarPaso1;
+  sec.appendChild(btn);
+  contenedor.appendChild(sec);
+}
+
+// PASO 2: estado del punto
+function renderPaso2(cont) {
+  var resumen = document.createElement('div');
+  resumen.className = 'resumen-activa';
+  resumen.innerHTML = '<h3>⦿ En punto · Paso 2 de 3</h3>' +
+    '<div class="resumen-row"><span>Tienda</span><span>' + registroActivo.punto.tienda + '</span></div>' +
+    '<div class="resumen-row"><span>Entrada</span><span>' + registroActivo.horaEntrada + '</span></div>';
+  cont.appendChild(resumen);
+
+  var sec = document.createElement('div');
+  sec.className = 'form-section';
+  sec.innerHTML = pasoHeader(2, 'Estado del Punto');
+
+  var c1 = document.createElement('div'); c1.className = 'campo';
+  c1.innerHTML = '<label>📸 Foto del punto (cómo lo dejas) <span class="obligatorio">*</span></label>';
+  c1.appendChild(crearInputFoto('foto-punto-salida','prev-punto-salida','fu-punto-salida','🏪','Foto del punto'));
+  sec.appendChild(c1);
+
+  var c2 = document.createElement('div'); c2.className = 'campo';
+  c2.innerHTML = '<label>Productos agotados <span class="obligatorio">*</span></label><textarea id="agotados-input" placeholder="Escribe los agotados o Ninguno..."></textarea>';
+  sec.appendChild(c2);
+
+  var c3 = document.createElement('div'); c3.className = 'campo';
+  c3.innerHTML = '<label>Sobrestock <span class="obligatorio">*</span></label><textarea id="sobrestock-input" placeholder="Escribe el sobrestock o Ninguno..."></textarea>';
+  sec.appendChild(c3);
+
+  var btn = document.createElement('button');
+  btn.className = 'btn-primary'; btn.textContent = 'Continuar al Paso 3 →';
+  btn.onclick = guardarPaso2;
+  sec.appendChild(btn);
+  cont.appendChild(sec);
+}
+
+// PASO 3: salida
+function renderPaso3(cont) {
+  var resumen = document.createElement('div');
+  resumen.className = 'resumen-activa';
+  resumen.innerHTML = '<h3>⦿ En punto · Paso 3 de 3</h3>' +
+    '<div class="resumen-row"><span>Tienda</span><span>' + registroActivo.punto.tienda + '</span></div>' +
+    '<div class="resumen-row"><span>Entrada</span><span>' + registroActivo.horaEntrada + '</span></div>';
+  cont.appendChild(resumen);
+
+  var sec = document.createElement('div');
+  sec.className = 'form-section';
+  sec.innerHTML = pasoHeader(3, 'Registro de Salida');
+
+  var c1 = document.createElement('div'); c1.className = 'campo';
+  c1.innerHTML = '<label>📸 Foto de ti al salir <span class="obligatorio">*</span></label>';
+  c1.appendChild(crearInputFoto('foto-salida-imp','prev-salida-imp','fu-salida-imp','🤳','Tomar foto'));
+  sec.appendChild(c1);
+
+  var c2 = document.createElement('div'); c2.className = 'campo';
+  c2.innerHTML = '<label>Ventas del día (total) <span class="obligatorio">*</span></label><div class="campo-pesos"><input type="number" id="ventas-input" placeholder="0" inputmode="numeric"></div>';
+  sec.appendChild(c2);
+
+  var c3 = document.createElement('div'); c3.className = 'campo';
+  c3.innerHTML = '<label>Producto más vendido <span class="obligatorio">*</span></label><input type="text" id="producto-mas-vendido" placeholder="Ej: Base líquida tono 3...">';
+  sec.appendChild(c3);
+
+  var btn = document.createElement('button');
+  btn.className = 'btn-primary'; btn.textContent = 'Finalizar jornada ✓';
+  btn.onclick = guardarPaso3;
+  sec.appendChild(btn);
+  cont.appendChild(sec);
+}
+
+// GUARDAR PASO 1
+function guardarPaso1() {
   if (!puntoSeleccionado) { mostrarToast('Selecciona un punto primero', 'error'); return; }
+  if (!fotosData['foto-entrada-imp']) { mostrarToast('Falta tu foto al llegar', 'error'); return; }
+  if (!fotosData['foto-entrada-punto']) { mostrarToast('Falta la foto de la exhibición', 'error'); return; }
   if (!estadoExhibicion) { mostrarToast('Selecciona el estado de la exhibición', 'error'); return; }
 
-  var btn = document.querySelector('#form-entrada .btn-primary');
+  var btn = document.querySelector('#form-paso1 .btn-primary');
   btn.disabled = true; btn.textContent = 'Guardando...';
 
-  var ts = Date.now();
-
-  // Comprimir fotos (pueden ser null si no se tomaron)
   Promise.all([
-    comprimirFoto(fotosData['foto-entrada-imp'] || null),
-    comprimirFoto(fotosData['foto-entrada-punto'] || null)
+    comprimirFoto(fotosData['foto-entrada-imp']),
+    comprimirFoto(fotosData['foto-entrada-punto'])
   ]).then(function(urls) {
+    var ts = Date.now();
     var registro = {
       cedula: usuarioActual.cedula,
       nombre: usuarioActual.nombre,
@@ -1473,10 +1547,9 @@ function registrarEntrada() {
       horaEntrada: horaActual(),
       tsEntrada: ts,
       estadoExhibicion: estadoExhibicion,
-      agotados: document.getElementById('agotados-input').value.trim(),
-      sobrestock: document.getElementById('sobrestock-input').value.trim(),
       fotoImpEntrada: urls[0] || '',
       fotoPuntoEntrada: urls[1] || '',
+      paso2completado: false,
       completado: false
     };
     var newRef = db.ref('sammy/historial/' + hoy()).push();
@@ -1488,47 +1561,78 @@ function registrarEntrada() {
   }).then(function(registro) {
     registroActivo = registro;
     fotosData = {}; estadoExhibicion = '';
-    mostrarToast('¡Entrada registrada! ✓', 'exito');
+    mostrarToast('Paso 1 guardado ✓', 'exito');
     renderContenidoImp();
   }).catch(function(e) {
-    console.error('registrarEntrada error:', e);
-    mostrarToast('Error al guardar: ' + e.message, 'error');
-    btn.disabled = false; btn.textContent = 'Registrar Entrada ✓';
+    console.error('paso1:', e);
+    mostrarToast('Error: ' + e.message, 'error');
+    btn.disabled = false; btn.textContent = 'Continuar al Paso 2 →';
   });
 }
 
-function registrarSalida() {
+// GUARDAR PASO 2
+function guardarPaso2() {
+  if (!fotosData['foto-punto-salida']) { mostrarToast('Falta la foto del punto', 'error'); return; }
+  var agotados = document.getElementById('agotados-input').value.trim();
+  var sobrestock = document.getElementById('sobrestock-input').value.trim();
+  if (!agotados) { mostrarToast('Escribe los agotados o "Ninguno"', 'error'); return; }
+  if (!sobrestock) { mostrarToast('Escribe el sobrestock o "Ninguno"', 'error'); return; }
+
   var btn = document.querySelector('#contenido-imp .btn-primary');
   btn.disabled = true; btn.textContent = 'Guardando...';
 
-  var ts = Date.now();
-
-  Promise.all([
-    comprimirFoto(fotosData['foto-salida-imp'] || null),
-    comprimirFoto(fotosData['foto-salida-punto'] || null)
-  ]).then(function(urls) {
+  comprimirFoto(fotosData['foto-punto-salida']).then(function(url) {
+    var act = { fotoPuntoSalida: url || '', agotados: agotados, sobrestock: sobrestock, paso2completado: true };
     var rid = registroActivo.registroId;
-    var actualizacion = {
+    return Promise.all([
+      db.ref('sammy/historial/' + hoy() + '/' + rid).update(act),
+      db.ref('sammy/registros_activos/' + usuarioActual.cedula).update(act)
+    ]).then(function(){ return act; });
+  }).then(function(act) {
+    Object.assign(registroActivo, act);
+    fotosData = {};
+    mostrarToast('Paso 2 guardado ✓', 'exito');
+    renderContenidoImp();
+  }).catch(function(e) {
+    console.error('paso2:', e);
+    mostrarToast('Error: ' + e.message, 'error');
+    btn.disabled = false; btn.textContent = 'Continuar al Paso 3 →';
+  });
+}
+
+// GUARDAR PASO 3
+function guardarPaso3() {
+  if (!fotosData['foto-salida-imp']) { mostrarToast('Falta tu foto al salir', 'error'); return; }
+  var ventas = document.getElementById('ventas-input').value;
+  var producto = document.getElementById('producto-mas-vendido').value.trim();
+  if (!ventas || Number(ventas) <= 0) { mostrarToast('Ingresa las ventas del día', 'error'); return; }
+  if (!producto) { mostrarToast('Escribe el producto más vendido', 'error'); return; }
+
+  var btn = document.querySelector('#contenido-imp .btn-primary');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  comprimirFoto(fotosData['foto-salida-imp']).then(function(url) {
+    var act = {
+      fotoImpSalida: url || '',
       horaSalida: horaActual(),
-      tsSalida: ts,
-      ventas: document.getElementById('ventas-input').value || 0,
-      productoMasVendido: document.getElementById('producto-mas-vendido').value.trim(),
-      fotoImpSalida: urls[0] || '',
-      fotoPuntoSalida: urls[1] || '',
+      tsSalida: Date.now(),
+      ventas: ventas,
+      productoMasVendido: producto,
       completado: true
     };
+    var rid = registroActivo.registroId;
     return Promise.all([
-      db.ref('sammy/historial/' + hoy() + '/' + rid).update(actualizacion),
+      db.ref('sammy/historial/' + hoy() + '/' + rid).update(act),
       db.ref('sammy/registros_activos/' + usuarioActual.cedula).remove()
     ]);
   }).then(function() {
     registroActivo = null; fotosData = {};
-    mostrarToast('¡Salida registrada! Hasta mañana 🌸', 'exito');
+    mostrarToast('¡Jornada completada! Hasta mañana 🌸', 'exito');
     setTimeout(function(){ renderContenidoImp(); }, 1500);
   }).catch(function(e) {
-    console.error('registrarSalida error:', e);
-    mostrarToast('Error al guardar: ' + e.message, 'error');
-    btn.disabled = false; btn.textContent = 'Registrar Salida ✓';
+    console.error('paso3:', e);
+    mostrarToast('Error: ' + e.message, 'error');
+    btn.disabled = false; btn.textContent = 'Finalizar jornada ✓';
   });
 }
 
@@ -1537,6 +1641,19 @@ function mostrarPantallaAdmin() {
   mostrarPantalla('admin');
   actualizarFechaAdmin();
   timerAdmin = setInterval(actualizarFechaAdmin, 30000);
+
+  // Auto-refresh historial y tiempo real cada 5 minutos
+  var countdown = 300;
+  setInterval(function() {
+    countdown--;
+    var el = document.getElementById('admin-countdown');
+    if (el) el.textContent = 'Actualiza en ' + countdown + 's';
+    if (countdown <= 0) {
+      countdown = 300;
+      var tabHistorial = document.getElementById('admin-historial');
+      if (tabHistorial && tabHistorial.style.display !== 'none') cargarHistorial();
+    }
+  }, 1000);
 
   var sel = document.getElementById('filtro-imp');
   Object.values(IMPULSADORAS).forEach(function(imp){
