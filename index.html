@@ -919,7 +919,7 @@ pre { margin: 0; }
   <div class="admin-tabs">
     <button class="admin-tab activo" onclick="adminTab('tiempo-real')">⦿ Tiempo Real</button>
     <button class="admin-tab" onclick="adminTab('historial')">Historial</button>
-    <button class="admin-tab" onclick="adminTab('json')">⚙ JSON</button>
+    <button class="admin-tab" onclick="adminTab('impulsadoras')">+ Impulsadoras</button>
   </div>
 
   <div class="admin-contenido">
@@ -974,59 +974,52 @@ pre { margin: 0; }
       </div>
     </div>
 
-    <!-- CONFIG / JSON -->
-    <div id="admin-json" style="display:none">
+    <!-- IMPULSADORAS -->
+    <div id="admin-impulsadoras" style="display:none">
 
-      <!-- FIREBASE STATUS -->
+      <!-- LISTA ACTUAL -->
       <div class="cfg-card">
-        <div class="cfg-titulo">🔥 Firebase</div>
-        <div id="cfg-fb-status" class="cfg-badge cfg-badge-checking">⏳ Verificando conexión...</div>
-        <div class="cfg-fb-info" id="cfg-fb-info">
-          <div class="cfg-mono-box">
-            databaseURL: registro-de-ingreso-sammy-default-rtdb<br>
-            projectId: registro-de-ingreso-sammy<br>
-            storageBucket: registro-de-ingreso-sammy.firebasestorage.app
-          </div>
-        </div>
+        <div class="cfg-titulo">👥 Impulsadoras registradas</div>
+        <div id="lista-impulsadoras-admin"></div>
       </div>
 
-      <!-- LEER / ESCRIBIR JSON -->
+      <!-- AGREGAR NUEVA -->
       <div class="cfg-card">
-        <div class="cfg-titulo">⚙ Datos Firebase</div>
-        <p class="cfg-desc">Lee o escribe datos directamente en la base de datos. Útil para cargar registros manualmente o corregir información.</p>
+        <div class="cfg-titulo">➕ Agregar impulsadora</div>
+        <div class="campo"><label>Nombre completo</label>
+          <input type="text" id="nueva-nombre" placeholder="Ej: María Pérez García">
+        </div>
+        <div class="campo"><label>Cédula</label>
+          <input type="number" id="nueva-cedula" placeholder="Ej: 1234567890" inputmode="numeric">
+        </div>
+        <div class="campo"><label>Ciudad base</label>
+          <select id="nueva-ciudad">
+            <option value="MEDELLIN">Medellín</option>
+            <option value="BOGOTA">Bogotá</option>
+            <option value="CALI">Cali</option>
+            <option value="BARRANQUILLA">Barranquilla</option>
+            <option value="CARTAGENA">Cartagena</option>
+            <option value="BUCARAMANGA">Bucaramanga</option>
+            <option value="SANTA MARTA">Santa Marta</option>
+            <option value="NEIVA">Neiva</option>
+            <option value="VILLAVICENCIO">Villavicencio</option>
+            <option value="CHIA">Chía</option>
+            <option value="CUCUTA">Cúcuta</option>
+            <option value="IBAGUE">Ibagué</option>
+            <option value="MONTERIA">Montería</option>
+            <option value="BARRANCABERMEJA">Barrancabermeja</option>
+          </select>
+        </div>
+        <div class="campo"><label>Teléfono (opcional)</label>
+          <input type="tel" id="nueva-tel" placeholder="Ej: 3001234567" inputmode="numeric">
+        </div>
 
-        <div class="campo">
-          <label>Ruta en Firebase</label>
-          <input type="text" id="json-ruta" placeholder="Ej: sammy/historial/2026-06-06" style="font-family:monospace;font-size:0.85rem">
-        </div>
-        <div class="campo">
-          <label>JSON a guardar</label>
-          <textarea id="json-input" style="height:180px;font-family:monospace;font-size:0.78rem;resize:vertical;line-height:1.5" placeholder='&#123;&#10;  "nombre": "Laura Cristina Rave",&#10;  "horaEntrada": "09:05"&#10;&#125;'></textarea>
-        </div>
+        <!-- PUNTOS DE LA NUEVA IMPULSADORA -->
+        <div class="cfg-titulo" style="margin-top:16px">Puntos asignados</div>
+        <div id="nuevos-puntos"></div>
+        <button class="cfg-btn-ghost" onclick="agregarPunto()" style="margin-bottom:14px">+ Agregar punto</button>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-          <button class="cfg-btn-primary" onclick="guardarJSON()">💾 Guardar</button>
-          <button class="cfg-btn-secondary" onclick="leerJSON()">🔍 Leer ruta</button>
-        </div>
-        <button class="cfg-btn-ghost" onclick="limpiarJSON()">✕ Limpiar</button>
-
-        <div id="json-resultado" style="display:none;margin-top:16px">
-          <div class="cfg-resultado-label" id="json-resultado-label">RESULTADO</div>
-          <div class="cfg-mono-box cfg-mono-resultado">
-            <pre id="json-resultado-texto" style="white-space:pre-wrap;word-break:break-all;margin:0;font-size:0.78rem;max-height:260px;overflow-y:auto"></pre>
-          </div>
-        </div>
-      </div>
-
-      <!-- ACCIONES RÁPIDAS -->
-      <div class="cfg-card">
-        <div class="cfg-titulo">⚡ Acciones rápidas</div>
-        <p class="cfg-desc">Lee rutas comunes con un toque.</p>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <button class="cfg-btn-ghost" onclick="accionRapida('sammy/registros_activos')">Ver activas ahora →</button>
-          <button class="cfg-btn-ghost" onclick="accionRapida('sammy/historial/' + hoy())">Ver historial de hoy →</button>
-          <button class="cfg-btn-ghost" onclick="accionRapida('sammy')">Ver toda la BD →</button>
-        </div>
+        <button class="cfg-btn-primary" style="width:100%" onclick="guardarNuevaImpulsadora()">Guardar impulsadora ✓</button>
       </div>
 
     </div>
@@ -1695,6 +1688,7 @@ function mostrarPantallaAdmin() {
   });
 
   document.getElementById('filtro-fecha').value = hoy();
+  cargarImpulsadorasExtra();
   iniciarTiempoReal();
   cargarHistorial();
 }
@@ -1710,14 +1704,14 @@ function adminTab(tab) {
     t.classList.toggle('activo',
       (tab === 'tiempo-real' && i === 0) ||
       (tab === 'historial' && i === 1) ||
-      (tab === 'json' && i === 2)
+      (tab === 'impulsadoras' && i === 2)
     );
   });
   document.getElementById('admin-tiempo-real').style.display = tab === 'tiempo-real' ? '' : 'none';
   document.getElementById('admin-historial').style.display = tab === 'historial' ? '' : 'none';
-  document.getElementById('admin-json').style.display = tab === 'json' ? '' : 'none';
+  document.getElementById('admin-impulsadoras').style.display = tab === 'impulsadoras' ? '' : 'none';
   if (tab === 'historial') cargarHistorial();
-  if (tab === 'json') verificarFirebase();
+  if (tab === 'impulsadoras') renderListaImpulsadoras();
 }
 
 function guardarJSON() {
@@ -1927,6 +1921,107 @@ function abrirFotoIdx(regIdx, fi) {
 }
 function cerrarModal() {
   document.getElementById('modal-foto').classList.remove('abierto');
+}
+
+// ===== GESTIÓN IMPULSADORAS =====
+var contadorPuntos = 0;
+
+function renderListaImpulsadoras() {
+  var lista = document.getElementById('lista-impulsadoras-admin');
+  var todas = Object.entries(IMPULSADORAS);
+  lista.innerHTML = todas.map(function(entry) {
+    var ced = entry[0], imp = entry[1];
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--crema2)">' +
+      '<div>' +
+        '<div style="font-weight:600;font-size:0.9rem">' + imp.nombre + '</div>' +
+        '<div style="font-size:0.75rem;color:var(--texto-suave)">' + imp.ciudad + ' · CC ' + ced + ' · ' + imp.puntos.length + ' punto(s)</div>' +
+      '</div>' +
+      '<button onclick="eliminarImpulsadora(\'' + ced + '\')" style="background:none;border:none;color:var(--rojo);font-size:1.1rem;cursor:pointer;padding:4px 8px">🗑</button>' +
+    '</div>';
+  }).join('');
+}
+
+function agregarPunto() {
+  contadorPuntos++;
+  var cont = document.getElementById('nuevos-puntos');
+  var div = document.createElement('div');
+  div.id = 'punto-' + contadorPuntos;
+  div.style.cssText = 'background:var(--crema);border-radius:10px;padding:12px;margin-bottom:10px;position:relative';
+  div.innerHTML =
+    '<button onclick="document.getElementById(\'punto-' + contadorPuntos + '\').remove()" ' +
+      'style="position:absolute;top:8px;right:8px;background:none;border:none;color:var(--texto-suave);cursor:pointer;font-size:1rem">✕</button>' +
+    '<div class="campo" style="margin-bottom:8px"><label>Nombre de la tienda</label>' +
+      '<input type="text" id="p' + contadorPuntos + '-tienda" placeholder="Ej: ÉXITO LAURELES"></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+      '<div class="campo" style="margin-bottom:0"><label>Cadena</label>' +
+        '<select id="p' + contadorPuntos + '-cadena">' +
+          '<option>ÉXITO</option><option>JUMBO</option><option>LOCATEL</option>' +
+          '<option>FALABELLA</option><option>LA MONTAÑA</option><option>TRES ELEFANTES</option>' +
+        '</select></div>' +
+      '<div class="campo" style="margin-bottom:0"><label>Ciudad</label>' +
+        '<input type="text" id="p' + contadorPuntos + '-ciudad" placeholder="MEDELLIN"></div>' +
+    '</div>' +
+    '<div class="campo" style="margin-top:8px;margin-bottom:0"><label>Días</label>' +
+      '<input type="text" id="p' + contadorPuntos + '-dias" placeholder="Ej: MARTES - VIERNES"></div>';
+  cont.appendChild(div);
+}
+
+function guardarNuevaImpulsadora() {
+  var nombre = document.getElementById('nueva-nombre').value.trim();
+  var cedula = document.getElementById('nueva-cedula').value.trim();
+  var ciudad = document.getElementById('nueva-ciudad').value;
+  var tel = document.getElementById('nueva-tel').value.trim();
+  if (!nombre) { mostrarToast('Escribe el nombre', 'error'); return; }
+  if (!cedula) { mostrarToast('Escribe la cédula', 'error'); return; }
+  if (IMPULSADORAS[cedula]) { mostrarToast('Esa cédula ya existe', 'error'); return; }
+  var puntos = [];
+  document.querySelectorAll('#nuevos-puntos > div').forEach(function(div) {
+    var n = div.id.replace('punto-', '');
+    var tienda = document.getElementById('p' + n + '-tienda');
+    var cadena = document.getElementById('p' + n + '-cadena');
+    var ciu = document.getElementById('p' + n + '-ciudad');
+    var dias = document.getElementById('p' + n + '-dias');
+    if (tienda && tienda.value.trim()) {
+      puntos.push({
+        id: tienda.value.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''),
+        tienda: tienda.value.trim().toUpperCase(),
+        cadena: cadena ? cadena.value : '',
+        ciudad: ciu ? ciu.value.trim().toUpperCase() : ciudad,
+        dias: dias ? dias.value.trim().toUpperCase() : ''
+      });
+    }
+  });
+  var nueva = { nombre: nombre, ciudad: ciudad, tel: tel, puntos: puntos };
+  db.ref('sammy/impulsadoras_extra/' + cedula).set(nueva).then(function() {
+    IMPULSADORAS[cedula] = nueva;
+    mostrarToast('✓ ' + nombre + ' agregada', 'exito');
+    document.getElementById('nueva-nombre').value = '';
+    document.getElementById('nueva-cedula').value = '';
+    document.getElementById('nueva-tel').value = '';
+    document.getElementById('nuevos-puntos').innerHTML = '';
+    contadorPuntos = 0;
+    renderListaImpulsadoras();
+  }).catch(function(e) { mostrarToast('Error: ' + e.message, 'error'); });
+}
+
+function eliminarImpulsadora(cedula) {
+  var imp = IMPULSADORAS[cedula];
+  if (!imp) return;
+  if (!confirm('¿Eliminar a ' + imp.nombre + '?')) return;
+  db.ref('sammy/impulsadoras_extra/' + cedula).remove().catch(function(){});
+  delete IMPULSADORAS[cedula];
+  mostrarToast('Impulsadora eliminada', '');
+  renderListaImpulsadoras();
+}
+
+function cargarImpulsadorasExtra() {
+  db.ref('sammy/impulsadoras_extra').get().then(function(snap) {
+    if (snap.exists()) {
+      Object.entries(snap.val()).forEach(function(entry) {
+        IMPULSADORAS[entry[0]] = entry[1];
+      });
+    }
+  }).catch(function(){});
 }
 
 // Enter listeners
