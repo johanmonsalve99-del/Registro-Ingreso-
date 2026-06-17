@@ -598,6 +598,51 @@ pre { margin: 0; }
 }
 .cfg-btn-ghost:hover { border-color: var(--rosa-claro); background: #F5F2FF; color: var(--rosa); }
 
+/* PRESUPUESTOS */
+.pres-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--sombra2);
+}
+.pres-tienda { font-weight: 700; font-size: 0.92rem; margin-bottom: 2px; }
+.pres-ciudad { font-size: 0.75rem; color: var(--texto-suave); margin-bottom: 10px; }
+.pres-barra-wrap {
+  background: var(--crema2);
+  border-radius: 20px;
+  height: 10px;
+  margin: 8px 0 4px;
+  overflow: hidden;
+}
+.pres-barra {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--rosa), var(--rosa-oscuro));
+  transition: width 0.5s ease;
+  min-width: 4px;
+}
+.pres-barra.sobre { background: linear-gradient(90deg, var(--verde), #2E8B57); }
+.pres-nums { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--texto-suave); margin-top: 4px; }
+.pres-porcentaje { font-size: 1.2rem; font-weight: 700; color: var(--rosa); }
+.pres-porcentaje.sobre { color: var(--verde); }
+.widget-pres {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--sombra2);
+  border-left: 4px solid var(--rosa);
+}
+.widget-pres h3 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--texto-suave);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
 /* TIEMPO REAL */
 .stats-grid {
   display: grid;
@@ -920,6 +965,7 @@ pre { margin: 0; }
     <button class="admin-tab activo" onclick="adminTab('tiempo-real')">⦿ Tiempo Real</button>
     <button class="admin-tab" onclick="adminTab('historial')">Historial</button>
     <button class="admin-tab" onclick="adminTab('impulsadoras')">+ Impulsadoras</button>
+    <button class="admin-tab" onclick="adminTab('presupuestos')">$ Presupuestos</button>
   </div>
 
   <div class="admin-contenido">
@@ -1023,6 +1069,42 @@ pre { margin: 0; }
       </div>
 
     </div>
+
+    <!-- PRESUPUESTOS -->
+    <div id="admin-presupuestos" style="display:none">
+
+      <div class="cfg-card">
+        <div class="cfg-titulo">$ Presupuestos por punto de venta</div>
+        <p class="cfg-desc">Selecciona una impulsadora y el período para ver y editar sus presupuestos. Las impulsadoras ven el avance en tiempo real.</p>
+        <div class="campo">
+          <label>Impulsadora</label>
+          <select id="pres-imp-select" onchange="cargarPresupuestosImp()">
+            <option value="">— Selecciona —</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="campo">
+            <label>Período</label>
+            <select id="pres-tipo" onchange="cargarPresupuestosImp()">
+              <option value="mensual">Mensual</option>
+              <option value="semanal">Semanal</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Mes / Semana</label>
+            <input type="month" id="pres-mes" onchange="cargarPresupuestosImp()">
+          </div>
+        </div>
+      </div>
+
+      <div id="pres-puntos-lista"></div>
+
+      <div id="pres-btn-wrap" style="display:none;padding-bottom:20px">
+        <button class="cfg-btn-primary" style="width:100%" onclick="guardarPresupuestos()">💾 Guardar presupuestos</button>
+      </div>
+
+    </div>
+
 </div>
 
 <!-- MODAL FOTO -->
@@ -1461,6 +1543,9 @@ function renderPaso2(cont) {
     '<div class="resumen-row"><span>Entrada</span><span>' + registroActivo.horaEntrada + '</span></div>';
   cont.appendChild(resumen);
 
+  // Widget presupuesto
+  cargarWidgetPresupuesto(cont, registroActivo.punto);
+
   var sec = document.createElement('div');
   sec.className = 'form-section';
   sec.innerHTML = pasoHeader(2, 'Estado del Punto');
@@ -1493,6 +1578,9 @@ function renderPaso3(cont) {
     '<div class="resumen-row"><span>Tienda</span><span>' + registroActivo.punto.tienda + '</span></div>' +
     '<div class="resumen-row"><span>Entrada</span><span>' + registroActivo.horaEntrada + '</span></div>';
   cont.appendChild(resumen);
+
+  // Widget presupuesto
+  cargarWidgetPresupuesto(cont, registroActivo.punto);
 
   var sec = document.createElement('div');
   sec.className = 'form-section';
@@ -1704,14 +1792,17 @@ function adminTab(tab) {
     t.classList.toggle('activo',
       (tab === 'tiempo-real' && i === 0) ||
       (tab === 'historial' && i === 1) ||
-      (tab === 'impulsadoras' && i === 2)
+      (tab === 'impulsadoras' && i === 2) ||
+      (tab === 'presupuestos' && i === 3)
     );
   });
   document.getElementById('admin-tiempo-real').style.display = tab === 'tiempo-real' ? '' : 'none';
   document.getElementById('admin-historial').style.display = tab === 'historial' ? '' : 'none';
   document.getElementById('admin-impulsadoras').style.display = tab === 'impulsadoras' ? '' : 'none';
+  document.getElementById('admin-presupuestos').style.display = tab === 'presupuestos' ? '' : 'none';
   if (tab === 'historial') cargarHistorial();
   if (tab === 'impulsadoras') renderListaImpulsadoras();
+  if (tab === 'presupuestos') iniciarPresupuestos();
 }
 
 function guardarJSON() {
@@ -2021,6 +2112,194 @@ function cargarImpulsadorasExtra() {
         IMPULSADORAS[entry[0]] = entry[1];
       });
     }
+  }).catch(function(){});
+}
+
+// ===== PRESUPUESTOS =====
+var presupuestosActuales = {};
+
+function iniciarPresupuestos() {
+  // Poblar select de impulsadoras
+  var sel = document.getElementById('pres-imp-select');
+  sel.innerHTML = '<option value="">— Selecciona —</option>';
+  Object.entries(IMPULSADORAS).forEach(function(entry) {
+    var opt = document.createElement('option');
+    opt.value = entry[0];
+    opt.textContent = entry[1].nombre.split(' ').slice(0,2).join(' ');
+    sel.appendChild(opt);
+  });
+  // Fecha default = mes actual
+  var ahora = new Date();
+  var mesStr = ahora.getFullYear() + '-' + String(ahora.getMonth()+1).padStart(2,'0');
+  document.getElementById('pres-mes').value = mesStr;
+}
+
+function periodoKey() {
+  var tipo = document.getElementById('pres-tipo').value;
+  var mes = document.getElementById('pres-mes').value || new Date().toISOString().slice(0,7);
+  if (tipo === 'semanal') {
+    // Calcular semana del mes
+    var d = new Date(mes + '-01');
+    var semana = Math.ceil(new Date().getDate() / 7);
+    return mes + '-S' + semana;
+  }
+  return mes;
+}
+
+function cargarPresupuestosImp() {
+  var cedula = document.getElementById('pres-imp-select').value;
+  var lista = document.getElementById('pres-puntos-lista');
+  var btnWrap = document.getElementById('pres-btn-wrap');
+  if (!cedula) { lista.innerHTML = ''; btnWrap.style.display = 'none'; return; }
+
+  var imp = IMPULSADORAS[cedula];
+  var periodo = periodoKey();
+  lista.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+
+  db.ref('sammy/presupuestos/' + cedula + '/' + periodo).get().then(function(snap) {
+    var guardados = snap.exists() ? snap.val() : {};
+    presupuestosActuales = guardados;
+
+    // Calcular ventas reales del período para cada punto
+    var mes = document.getElementById('pres-mes').value || new Date().toISOString().slice(0,7);
+    db.ref('sammy/historial').get().then(function(snapH) {
+      var ventasPorPunto = {};
+      if (snapH.exists()) {
+        Object.entries(snapH.val()).forEach(function(dEntry) {
+          var fecha = dEntry[0];
+          if (!fecha.startsWith(mes)) return;
+          Object.values(dEntry[1]).forEach(function(r) {
+            if (r.cedula !== cedula) return;
+            var pid = r.punto ? r.punto.id : null;
+            if (!pid) return;
+            ventasPorPunto[pid] = (ventasPorPunto[pid] || 0) + (Number(r.ventas) || 0);
+          });
+        });
+      }
+
+      lista.innerHTML = '';
+      imp.puntos.forEach(function(p) {
+        var presup = Number(guardados[p.id] || 0);
+        var ventas = ventasPorPunto[p.id] || 0;
+        var pct = presup > 0 ? Math.min(Math.round(ventas / presup * 100), 999) : 0;
+        var sobre = pct >= 100;
+
+        var card = document.createElement('div');
+        card.className = 'pres-card';
+        card.innerHTML =
+          '<div class="pres-tienda">' + p.tienda + '</div>' +
+          '<div class="pres-ciudad">' + p.cadena + ' · ' + p.ciudad + '</div>' +
+          '<div class="campo" style="margin-bottom:8px">' +
+            '<label>Presupuesto ' + (document.getElementById('pres-tipo').value === 'semanal' ? 'semanal' : 'mensual') + '</label>' +
+            '<div class="campo-pesos"><input type="number" id="pres-' + p.id + '" value="' + (presup || '') + '" placeholder="0" inputmode="numeric" onchange="actualizarBarraPreview(\'' + p.id + '\')"></div>' +
+          '</div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center">' +
+            '<span style="font-size:0.78rem;color:var(--texto-suave)">Ventas del mes: <strong>' + formatPesos(ventas) + '</strong></span>' +
+            '<span class="pres-porcentaje' + (sobre?' sobre':'') + '" id="pct-' + p.id + '">' + pct + '%</span>' +
+          '</div>' +
+          '<div class="pres-barra-wrap"><div class="pres-barra' + (sobre?' sobre':'') + '" id="barra-' + p.id + '" style="width:' + Math.min(pct,100) + '%"></div></div>' +
+          '<div class="pres-nums"><span>$0</span><span>' + (presup ? formatPesos(presup) : 'Sin presupuesto') + '</span></div>';
+        lista.appendChild(card);
+      });
+
+      btnWrap.style.display = '';
+    });
+  }).catch(function(e) {
+    lista.innerHTML = '<div class="empty-state"><div class="icono">⚠️</div><p>Error cargando presupuestos</p></div>';
+  });
+}
+
+function actualizarBarraPreview(pid) {
+  var input = document.getElementById('pres-' + pid);
+  var presup = Number(input.value) || 0;
+  // Recalcular visual solo con el nuevo presupuesto
+  var barraEl = document.getElementById('barra-' + pid);
+  var pctEl = document.getElementById('pct-' + pid);
+  if (!barraEl || !pctEl) return;
+  // Mantener ventas actuales del estado guardado
+  var ventasActuales = presupuestosActuales['_ventas_' + pid] || 0;
+  var pct = presup > 0 ? Math.min(Math.round(ventasActuales / presup * 100), 999) : 0;
+  barraEl.style.width = Math.min(pct, 100) + '%';
+  pctEl.textContent = pct + '%';
+  // Actualizar label de meta
+  var wrap = barraEl.closest('.pres-card');
+  if (wrap) {
+    var nums = wrap.querySelector('.pres-nums');
+    if (nums) nums.lastElementChild.textContent = presup ? formatPesos(presup) : 'Sin presupuesto';
+  }
+}
+
+function guardarPresupuestos() {
+  var cedula = document.getElementById('pres-imp-select').value;
+  if (!cedula) return;
+  var imp = IMPULSADORAS[cedula];
+  var periodo = periodoKey();
+  var datos = {};
+  imp.puntos.forEach(function(p) {
+    var input = document.getElementById('pres-' + p.id);
+    if (input && input.value) datos[p.id] = Number(input.value);
+  });
+  db.ref('sammy/presupuestos/' + cedula + '/' + periodo).set(datos).then(function() {
+    mostrarToast('✓ Presupuestos guardados para ' + imp.nombre.split(' ')[0], 'exito');
+    presupuestosActuales = datos;
+  }).catch(function(e) {
+    mostrarToast('Error: ' + e.message, 'error');
+  });
+}
+
+// ===== WIDGET PRESUPUESTO EN PANEL IMPULSADORA =====
+function cargarWidgetPresupuesto(cont, punto) {
+  var ahora = new Date();
+  var mes = ahora.getFullYear() + '-' + String(ahora.getMonth()+1).padStart(2,'0');
+
+  // Leer presupuesto mensual y semanal
+  db.ref('sammy/presupuestos/' + usuarioActual.cedula + '/' + mes).get().then(function(snap) {
+    if (!snap.exists()) return;
+    var datos = snap.val();
+    var presupMes = Number(datos[punto.id] || 0);
+    if (!presupMes) return;
+
+    // Leer ventas del mes para ese punto
+    db.ref('sammy/historial').get().then(function(snapH) {
+      var totalVentas = 0;
+      if (snapH.exists()) {
+        Object.entries(snapH.val()).forEach(function(dEntry) {
+          var fecha = dEntry[0];
+          if (!fecha.startsWith(mes)) return;
+          Object.values(dEntry[1]).forEach(function(r) {
+            if (r.cedula === usuarioActual.cedula && r.punto && r.punto.id === punto.id && r.ventas) {
+              totalVentas += Number(r.ventas);
+            }
+          });
+        });
+      }
+      var pct = Math.min(Math.round(totalVentas / presupMes * 100), 999);
+      var sobre = pct >= 100;
+
+      var widget = document.createElement('div');
+      widget.className = 'widget-pres';
+      widget.innerHTML =
+        '<h3>📊 Presupuesto del mes</h3>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+          '<div>' +
+            '<div style="font-size:0.8rem;color:var(--texto-suave)">Ventas acumuladas</div>' +
+            '<div style="font-weight:700;font-size:1rem">' + formatPesos(totalVentas) + '</div>' +
+          '</div>' +
+          '<div style="text-align:right">' +
+            '<div style="font-size:0.8rem;color:var(--texto-suave)">Meta mensual</div>' +
+            '<div style="font-weight:700;font-size:1rem">' + formatPesos(presupMes) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pres-barra-wrap"><div class="pres-barra' + (sobre?' sobre':'') + '" style="width:' + Math.min(pct,100) + '%"></div></div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">' +
+          '<span style="font-size:0.75rem;color:var(--texto-suave)">Faltan: ' + formatPesos(Math.max(presupMes - totalVentas, 0)) + '</span>' +
+          '<span style="font-weight:700;font-size:1.1rem;color:' + (sobre ? 'var(--verde)' : 'var(--rosa)') + '">' + pct + '%</span>' +
+        '</div>';
+
+      // Insertar al inicio del contenido
+      var primerHijo = cont.firstChild;
+      cont.insertBefore(widget, primerHijo ? primerHijo.nextSibling : null);
+    });
   }).catch(function(){});
 }
 
