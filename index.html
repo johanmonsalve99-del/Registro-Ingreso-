@@ -1543,16 +1543,29 @@ function renderPaso2(cont) {
     '<div class="resumen-row"><span>Entrada</span><span>' + registroActivo.horaEntrada + '</span></div>';
   cont.appendChild(resumen);
 
-  // Widget presupuesto
   cargarWidgetPresupuesto(cont, registroActivo.punto);
 
   var sec = document.createElement('div');
   sec.className = 'form-section';
   sec.innerHTML = pasoHeader(2, 'Estado del Punto');
 
+  // Contenedor de fotos múltiples
   var c1 = document.createElement('div'); c1.className = 'campo';
-  c1.innerHTML = '<label>📸 Foto del punto (cómo lo dejas) <span class="obligatorio">*</span></label>';
-  c1.appendChild(crearInputFoto('foto-punto-salida','prev-punto-salida','fu-punto-salida','🏪','Foto del punto'));
+  c1.innerHTML = '<label>📸 Fotos del punto de exhibición <span class="obligatorio">*</span><br><small style="color:var(--texto-suave);font-weight:400">Toma una foto por cada sección del punto</small></label>';
+
+  var fotosGrid = document.createElement('div');
+  fotosGrid.id = 'fotos-punto-grid';
+  fotosGrid.style.cssText = 'display:flex;flex-direction:column;gap:10px;margin-top:8px';
+  c1.appendChild(fotosGrid);
+
+  // Botón agregar foto
+  var btnAdd = document.createElement('button');
+  btnAdd.type = 'button';
+  btnAdd.style.cssText = 'width:100%;padding:12px;background:var(--crema);border:2px dashed var(--rosa-claro);border-radius:10px;color:var(--rosa);font-family:"DM Sans",sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;margin-top:6px;transition:all 0.2s';
+  btnAdd.textContent = '+ Agregar otra foto';
+  btnAdd.onclick = function() { agregarFotoPunto(); };
+  c1.appendChild(btnAdd);
+
   sec.appendChild(c1);
 
   var c2 = document.createElement('div'); c2.className = 'campo';
@@ -1568,9 +1581,108 @@ function renderPaso2(cont) {
   btn.onclick = guardarPaso2;
   sec.appendChild(btn);
   cont.appendChild(sec);
+
+  // Agregar primera foto automáticamente
+  agregarFotoPunto();
 }
 
-// PASO 3: salida
+var contFotosPunto = 0;
+function agregarFotoPunto() {
+  contFotosPunto++;
+  var n = contFotosPunto;
+  var id = 'foto-punto-' + n;
+  var grid = document.getElementById('fotos-punto-grid');
+  if (!grid) return;
+
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'position:relative';
+
+  // Botón eliminar (solo si no es la primera)
+  if (n > 1) {
+    var btnDel = document.createElement('button');
+    btnDel.type = 'button';
+    btnDel.style.cssText = 'position:absolute;top:6px;right:6px;z-index:2;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center';
+    btnDel.textContent = '✕';
+    btnDel.onclick = function() {
+      delete fotosData[id];
+      wrap.remove();
+    };
+    wrap.appendChild(btnDel);
+  }
+
+  var uploadDiv = document.createElement('div');
+  uploadDiv.className = 'foto-upload';
+  uploadDiv.id = 'fu-' + id;
+  uploadDiv.style.cssText = 'min-height:120px';
+
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.id = id;
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.style.cssText = 'position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0';
+
+  var icoDiv = document.createElement('div');
+  icoDiv.className = 'icono';
+  icoDiv.textContent = '🏪';
+
+  var p = document.createElement('p');
+  p.textContent = 'Foto ' + n + ' del punto';
+
+  var prev = document.createElement('img');
+  prev.className = 'foto-preview';
+  prev.id = 'prev-' + id;
+
+  input.addEventListener('change', function() {
+    var file = this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      prev.src = e.target.result;
+      prev.classList.add('visible');
+      uploadDiv.classList.add('con-foto');
+      p.textContent = '✓ Foto ' + n + ' lista';
+      fotosData[id] = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  uploadDiv.appendChild(input);
+  uploadDiv.appendChild(icoDiv);
+  uploadDiv.appendChild(p);
+  uploadDiv.appendChild(prev);
+  wrap.appendChild(uploadDiv);
+  grid.appendChild(wrap);
+}
+
+// Comprime foto — 900px, 75% calidad (buena calidad, tamaño razonable)
+function comprimirFoto(base64) {
+  return new Promise(function(resolve) {
+    if (!base64) { resolve(''); return; }
+    var timer = setTimeout(function() {
+      console.warn('comprimirFoto timeout');
+      resolve('');
+    }, 6000);
+    try {
+      var img = new Image();
+      img.onload = function() {
+        try {
+          clearTimeout(timer);
+          var MAX = 900;
+          var w = img.width, h = img.height;
+          var ratio = Math.min(MAX / w, MAX / h, 1);
+          w = Math.round(w * ratio); h = Math.round(h * ratio);
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.75));
+        } catch(e) { clearTimeout(timer); resolve(''); }
+      };
+      img.onerror = function() { clearTimeout(timer); resolve(''); };
+      img.src = base64;
+    } catch(e) { clearTimeout(timer); resolve(''); }
+  });
+}
 function renderPaso3(cont) {
   var resumen = document.createElement('div');
   resumen.className = 'resumen-activa';
@@ -1684,7 +1796,9 @@ function guardarPaso1() {
 
 // GUARDAR PASO 2
 function guardarPaso2() {
-  if (!fotosData['foto-punto-salida']) { mostrarToast('Falta la foto del punto', 'error'); return; }
+  // Recoger todas las fotos del punto
+  var clavesFotos = Object.keys(fotosData).filter(function(k) { return k.startsWith('foto-punto-'); });
+  if (clavesFotos.length === 0) { mostrarToast('Toma al menos una foto del punto', 'error'); return; }
   var agotados = document.getElementById('agotados-input').value.trim();
   var sobrestock = document.getElementById('sobrestock-input').value.trim();
   if (!agotados) { mostrarToast('Escribe los agotados o "Ninguno"', 'error'); return; }
@@ -1693,8 +1807,16 @@ function guardarPaso2() {
   var btn = document.querySelector('#contenido-imp .btn-primary');
   btn.disabled = true; btn.textContent = 'Guardando...';
 
-  comprimirFoto(fotosData['foto-punto-salida']).then(function(url) {
-    var act = { fotoPuntoSalida: url || '', agotados: agotados, sobrestock: sobrestock, paso2completado: true };
+  // Comprimir todas las fotos en paralelo
+  Promise.all(clavesFotos.map(function(k) { return comprimirFoto(fotosData[k]); })).then(function(urls) {
+    urls = urls.filter(function(u) { return u && u.length > 10; });
+    var act = {
+      fotosPuntoSalida: urls,         // array de fotos
+      fotoPuntoSalida: urls[0] || '', // compatibilidad con historial
+      agotados: agotados,
+      sobrestock: sobrestock,
+      paso2completado: true
+    };
     var rid = registroActivo.registroId;
     return Promise.all([
       db.ref('sammy/historial/' + hoy() + '/' + rid).update(act),
@@ -1702,7 +1824,7 @@ function guardarPaso2() {
     ]).then(function(){ return act; });
   }).then(function(act) {
     Object.assign(registroActivo, act);
-    fotosData = {};
+    fotosData = {}; contFotosPunto = 0;
     mostrarToast('Paso 2 guardado ✓', 'exito');
     renderContenidoImp();
   }).catch(function(e) {
@@ -1961,17 +2083,21 @@ function cargarHistorial() {
         ? '<span class="completado-badge">✓ Completo</span>'
         : '<span class="pendiente-badge">⦿ En punto</span>';
 
-      // Guardar fotos en memoria para modal
-      var fotosList = [r.fotoImpEntrada, r.fotoPuntoEntrada, r.fotoPuntoSalida, r.fotoImpSalida];
+      // Fotos múltiples del punto
+      var fotosPunto = r.fotosPuntoSalida && r.fotosPuntoSalida.length ? r.fotosPuntoSalida : (r.fotoPuntoSalida ? [r.fotoPuntoSalida] : []);
+      var fotosList = [r.fotoImpEntrada, r.fotoPuntoEntrada].concat(fotosPunto).concat([r.fotoImpSalida]);
+      var fotosLabels = ['🤳'].concat(fotosPunto.map(function(_,i){ return i===0?'🏪':'🏪'+(i+1); })).concat(['🏪 Entrada','👋']);
+      // Reordenar: llegada, stand entrada, stands salida(s), salida
+      fotosList = [r.fotoImpEntrada, r.fotoPuntoEntrada].concat(fotosPunto).concat([r.fotoImpSalida]);
+      fotosLabels = ['🤳 Llegada', '🏪 Entrada'].concat(fotosPunto.map(function(_,i){ return '🏪 Stand '+(i+1); })).concat(['👋 Salida']);
       var regIdx = registros.indexOf(r);
       window._fotosHistorial = window._fotosHistorial || {};
       window._fotosHistorial[regIdx] = fotosList;
 
-      var fotosLabels = ['🤳','🏪','🏁','👋'];
       var fotosHtml = fotosList.map(function(url, fi){
         return (url && url.length > 10)
-          ? '<img class="foto-thumb" src="' + url + '" onclick="abrirFotoIdx(' + regIdx + ',' + fi + ')" loading="lazy">'
-          : '<div class="foto-placeholder">' + fotosLabels[fi] + '</div>';
+          ? '<img class="foto-thumb" src="' + url + '" onclick="abrirFotoIdx(' + regIdx + ',' + fi + ')" loading="lazy" title="' + (fotosLabels[fi]||'') + '">'
+          : '<div class="foto-placeholder" title="' + (fotosLabels[fi]||'') + '">📷</div>';
       }).join('');
 
       var extras = '';
