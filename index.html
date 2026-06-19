@@ -1291,7 +1291,11 @@ var timerAdmin = null;
 
 // ===== UTILIDADES =====
 function hoy() {
-  return new Date().toISOString().split('T')[0];
+  var d = new Date();
+  var yr = d.getFullYear();
+  var mo = String(d.getMonth() + 1).padStart(2, '0');
+  var dy = String(d.getDate()).padStart(2, '0');
+  return yr + '-' + mo + '-' + dy;
 }
 function horaActual() {
   return new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
@@ -1452,7 +1456,10 @@ function renderStepper(pasoActivo) {
   return div;
 }
 
-var pasoActual = 0;
+function mesActual() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
 
 function renderContenidoImp() {
   var cont = document.getElementById('contenido-imp');
@@ -1747,14 +1754,14 @@ function comprimirFoto(base64) {
       img.onload = function() {
         try {
           clearTimeout(timer);
-          var MAX = 400;
+          var MAX = 900;
           var w = img.width, h = img.height;
           var ratio = Math.min(MAX / w, MAX / h, 1);
           w = Math.round(w * ratio); h = Math.round(h * ratio);
           var canvas = document.createElement('canvas');
           canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', 0.4));
+          resolve(canvas.toDataURL('image/jpeg', 0.75));
         } catch(e) { clearTimeout(timer); resolve(''); }
       };
       img.onerror = function() { clearTimeout(timer); resolve(''); };
@@ -1938,7 +1945,22 @@ function adminTab(tab) {
   document.getElementById('admin-historial').style.display = tab === 'historial' ? '' : 'none';
   document.getElementById('admin-impulsadoras').style.display = tab === 'impulsadoras' ? '' : 'none';
   document.getElementById('admin-presupuestos').style.display = tab === 'presupuestos' ? '' : 'none';
-  if (tab === 'historial') cargarHistorial();
+  if (tab === 'historial') {
+    // Poblar select Excel
+    var selExcel = document.getElementById('excel-imp');
+    if (selExcel && selExcel.options.length <= 1) {
+      Object.values(IMPULSADORAS).forEach(function(imp) {
+        var opt = document.createElement('option');
+        opt.value = imp.nombre;
+        opt.textContent = imp.nombre.split(' ').slice(0,2).join(' ');
+        selExcel.appendChild(opt);
+      });
+    }
+    // Mes default en el selector Excel
+    var excelMes = document.getElementById('excel-mes');
+    if (excelMes && !excelMes.value) excelMes.value = mesActual();
+    cargarHistorial();
+  }
   if (tab === 'impulsadoras') renderListaImpulsadoras();
   if (tab === 'presupuestos') iniciarPresupuestos();
 }
@@ -2278,7 +2300,7 @@ function iniciarPresupuestos() {
 
 function periodoKey() {
   var tipo = document.getElementById('pres-tipo').value;
-  var mes = document.getElementById('pres-mes').value || new Date().toISOString().slice(0,7);
+  var mes = document.getElementById('pres-mes').value || mesActual();
   if (tipo === 'semanal') {
     // Calcular semana del mes
     var d = new Date(mes + '-01');
@@ -2303,7 +2325,7 @@ function cargarPresupuestosImp() {
     presupuestosActuales = guardados;
 
     // Calcular ventas reales del período para cada punto
-    var mes = document.getElementById('pres-mes').value || new Date().toISOString().slice(0,7);
+    var mes = document.getElementById('pres-mes').value || mesActual();
     db.ref('sammy/historial').get().then(function(snapH) {
       var ventasPorPunto = {};
       if (snapH.exists()) {
@@ -2443,6 +2465,106 @@ function cargarWidgetPresupuesto(cont, punto) {
       cont.insertBefore(widget, primerHijo ? primerHijo.nextSibling : null);
     });
   }).catch(function(){});
+}
+
+// ===== EXPORTAR EXCEL =====
+function exportarExcel() {
+  var mes = document.getElementById('excel-mes').value;
+  var impFiltro = document.getElementById('excel-imp').value;
+
+  if (!mes) { mostrarToast('Selecciona un mes primero', 'error'); return; }
+
+  mostrarToast('Generando Excel...', '');
+
+  // Obtener todas las fechas del mes
+  var año = parseInt(mes.split('-')[0]);
+  var mesNum = parseInt(mes.split('-')[1]);
+  var diasEnMes = new Date(año, mesNum, 0).getDate();
+  var fechas = [];
+  for (var d = 1; d <= diasEnMes; d++) {
+    fechas.push(mes + '-' + String(d).padStart(2, '0'));
+  }
+
+  // Leer todos los días del mes
+  Promise.all(fechas.map(function(fecha) {
+    return db.ref('sammy/historial/' + fecha).get().then(function(snap) {
+      return snap.exists() ? Object.values(snap.val()) : [];
+    }).catch(function() { return []; });
+  })).then(function(resultados) {
+    var todos = [];
+    resultados.forEach(function(dia) { todos = todos.concat(dia); });
+
+    // Filtrar por impulsadora si aplica
+    if (impFiltro) todos = todos.filter(function(r) { return r.nombre === impFiltro; });
+
+    if (!todos.length) { mostrarToast('Sin registros para este período', 'error'); return; }
+
+    // Ordenar por fecha y hora
+    todos.sort(function(a, b) { return (a.tsEntrada || 0) - (b.tsEntrada || 0); });
+
+    // Construir filas
+    var filas = todos.map(function(r) {
+      return {
+        'Nombre': r.nombre || '',
+        'Cédula': r.cedula || '',
+        'Ciudad': r.ciudadBase || '',
+        'Punto': r.punto ? r.punto.tienda : '',
+        'Cadena': r.punto ? r.punto.cadena : '',
+        'Ciudad Punto': r.punto ? r.punto.ciudad : '',
+        'Fecha': r.fecha || '',
+        'Hora Entrada': r.horaEntrada || '',
+        'Hora Salida': r.horaSalida || '',
+        'Estado Exhibición': r.estadoExhibicion || '',
+        'Agotados': r.agotados || '',
+        'Sobrestock': r.sobrestock || '',
+        'Ventas del Día': r.ventas ? Number(r.ventas) : 0,
+        'Producto más Vendido': r.productoMasVendido || '',
+        'Completado': r.completado ? 'Sí' : 'No'
+      };
+    });
+
+    // Crear Excel con SheetJS
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.json_to_sheet(filas);
+
+    // Ancho de columnas
+    ws['!cols'] = [
+      {wch:25},{wch:14},{wch:14},{wch:28},{wch:14},{wch:16},
+      {wch:12},{wch:13},{wch:13},{wch:18},{wch:30},{wch:30},
+      {wch:16},{wch:25},{wch:11}
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Registros');
+
+    // Hoja resumen por impulsadora
+    var resumen = {};
+    filas.forEach(function(f) {
+      var key = f['Nombre'];
+      if (!resumen[key]) resumen[key] = { nombre: key, ciudad: f['Ciudad'], dias: 0, ventas: 0, registros: 0 };
+      resumen[key].registros++;
+      resumen[key].ventas += f['Ventas del Día'] || 0;
+      if (f['Hora Salida']) resumen[key].dias++;
+    });
+    var filasResumen = Object.values(resumen).map(function(r) {
+      return {
+        'Impulsadora': r.nombre,
+        'Ciudad': r.ciudad,
+        'Días trabajados': r.dias,
+        'Total registros': r.registros,
+        'Total ventas': r.ventas
+      };
+    });
+    var wsRes = XLSX.utils.json_to_sheet(filasResumen);
+    wsRes['!cols'] = [{wch:28},{wch:16},{wch:16},{wch:16},{wch:16}];
+    XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen');
+
+    // Descargar
+    var nombreArchivo = 'SAMMY_' + mes + (impFiltro ? '_' + impFiltro.split(' ')[0] : '') + '.xlsx';
+    XLSX.writeFile(wb, nombreArchivo);
+    mostrarToast('✓ Excel descargado', 'exito');
+  }).catch(function(e) {
+    mostrarToast('Error al generar Excel: ' + e.message, 'error');
+  });
 }
 
 // Enter listeners
