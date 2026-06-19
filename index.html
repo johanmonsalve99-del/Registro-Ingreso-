@@ -992,6 +992,8 @@ pre { margin: 0; }
 
     <!-- HISTORIAL -->
     <div id="admin-historial" style="display:none">
+
+      <!-- FILTROS POR DÍA -->
       <div class="filtros">
         <input type="date" id="filtro-fecha" onchange="cargarHistorial()">
         <select id="filtro-imp" onchange="cargarHistorial()">
@@ -999,22 +1001,33 @@ pre { margin: 0; }
         </select>
         <select id="filtro-ciudad" onchange="cargarHistorial()" style="grid-column: span 2">
           <option value="">Todas las ciudades</option>
-          <option>MEDELLIN</option>
-          <option>BOGOTA</option>
-          <option>CALI</option>
-          <option>BARRANQUILLA</option>
-          <option>CARTAGENA</option>
-          <option>BUCARAMANGA</option>
-          <option>SANTA MARTA</option>
-          <option>NEIVA</option>
-          <option>VILLAVICENCIO</option>
-          <option>CHIA</option>
-          <option>CUCUTA</option>
-          <option>IBAGUE</option>
-          <option>MONTERIA</option>
-          <option>BARRANCABERMEJA</option>
+          <option>MEDELLIN</option><option>BOGOTA</option><option>CALI</option>
+          <option>BARRANQUILLA</option><option>CARTAGENA</option><option>BUCARAMANGA</option>
+          <option>SANTA MARTA</option><option>NEIVA</option><option>VILLAVICENCIO</option>
+          <option>CHIA</option><option>CUCUTA</option><option>IBAGUE</option>
+          <option>MONTERIA</option><option>BARRANCABERMEJA</option>
         </select>
       </div>
+
+      <!-- EXPORTAR EXCEL MENSUAL -->
+      <div class="cfg-card" style="margin-bottom:14px">
+        <div class="cfg-titulo">📥 Exportar a Excel</div>
+        <p class="cfg-desc">Descarga todos los registros del mes seleccionado en un archivo Excel.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div class="campo" style="margin:0">
+            <label>Mes</label>
+            <input type="month" id="excel-mes">
+          </div>
+          <div class="campo" style="margin:0">
+            <label>Impulsadora</label>
+            <select id="excel-imp">
+              <option value="">Todas</option>
+            </select>
+          </div>
+        </div>
+        <button class="cfg-btn-primary" style="width:100%" onclick="exportarExcel()">⬇ Descargar Excel</button>
+      </div>
+
       <div id="lista-historial">
         <div class="loading"><div class="spinner"></div> Cargando...</div>
       </div>
@@ -1117,6 +1130,9 @@ pre { margin: 0; }
 <div class="toast" id="toast"></div>
 
 <!-- FIREBASE -->
+
+<!-- SheetJS para exportar Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <!-- FIREBASE COMPAT (funciona con onclick) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
