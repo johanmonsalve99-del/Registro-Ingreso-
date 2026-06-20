@@ -1841,8 +1841,9 @@ function guardarPaso2() {
       paso2completado: true
     };
     var rid = registroActivo.registroId;
+    var fechaRegistro = registroActivo.fecha || hoy();
     return Promise.all([
-      db.ref('sammy/historial/' + hoy() + '/' + rid).update(act),
+      db.ref('sammy/historial/' + fechaRegistro + '/' + rid).update(act),
       db.ref('sammy/registros_activos/' + usuarioActual.cedula).update(act)
     ]).then(function(){ return act; });
   }).then(function(act) {
@@ -1868,6 +1869,11 @@ function guardarPaso3() {
   var btn = document.querySelector('#contenido-imp .btn-primary');
   btn.disabled = true; btn.textContent = 'Guardando...';
 
+  // IMPORTANTE: usar la fecha de entrada, no la fecha actual
+  // Así si la salida es después de medianoche UTC, queda en el día correcto
+  var fechaRegistro = registroActivo.fecha || hoy();
+  var rid = registroActivo.registroId;
+
   comprimirFoto(fotosData['foto-salida-imp']).then(function(url) {
     var act = {
       fotoImpSalida: url || '',
@@ -1877,9 +1883,8 @@ function guardarPaso3() {
       productoMasVendido: producto,
       completado: true
     };
-    var rid = registroActivo.registroId;
     return Promise.all([
-      db.ref('sammy/historial/' + hoy() + '/' + rid).update(act),
+      db.ref('sammy/historial/' + fechaRegistro + '/' + rid).update(act),
       db.ref('sammy/registros_activos/' + usuarioActual.cedula).remove()
     ]);
   }).then(function() {
@@ -2105,7 +2110,7 @@ function cargarHistorial() {
     }
   window._fotosHistorial = {};
 
-  var registros = Object.values(snap.val());
+  var registros = Object.values(snap.val()).filter(function(r){ return r && r.nombre && r.horaEntrada; });
     if (impFiltro) registros = registros.filter(function(r){ return r.nombre === impFiltro; });
     if (ciudadFiltro) registros = registros.filter(function(r){ return r.punto && r.punto.ciudad === ciudadFiltro; });
     registros.sort(function(a,b){ return a.tsEntrada - b.tsEntrada; });
