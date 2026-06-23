@@ -1331,15 +1331,36 @@ function cambiarTab(tab) {
 function loginImpulsadora() {
   var cedula = document.getElementById('cedula-input').value.trim();
   var err = document.getElementById('error-login');
-  var imp = IMPULSADORAS[cedula];
-  if (!imp) {
-    err.textContent = 'Cédula no encontrada. Verifica e intenta de nuevo.';
-    err.classList.add('visible');
+  var btn = document.querySelector('#tab-impulsadora .btn-primary');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+
+  // Primero buscar en hardcodeadas
+  if (IMPULSADORAS[cedula]) {
+    err.classList.remove('visible');
+    usuarioActual = Object.assign({ cedula: cedula }, IMPULSADORAS[cedula]);
+    btn.disabled = false; btn.textContent = 'Ingresar →';
+    mostrarPantallaImpulsadora();
     return;
   }
-  err.classList.remove('visible');
-  usuarioActual = Object.assign({ cedula: cedula }, imp);
-  mostrarPantallaImpulsadora();
+
+  // Si no está hardcodeada, buscar en Firebase
+  db.ref('sammy/impulsadoras_extra/' + cedula).get().then(function(snap) {
+    btn.disabled = false; btn.textContent = 'Ingresar →';
+    if (snap.exists()) {
+      var imp = snap.val();
+      IMPULSADORAS[cedula] = imp; // cachear localmente
+      err.classList.remove('visible');
+      usuarioActual = Object.assign({ cedula: cedula }, imp);
+      mostrarPantallaImpulsadora();
+    } else {
+      err.textContent = 'Cédula no encontrada. Verifica e intenta de nuevo.';
+      err.classList.add('visible');
+    }
+  }).catch(function() {
+    btn.disabled = false; btn.textContent = 'Ingresar →';
+    err.textContent = 'Error de conexión. Intenta de nuevo.';
+    err.classList.add('visible');
+  });
 }
 
 function loginAdmin() {
@@ -1918,17 +1939,19 @@ function mostrarPantallaAdmin() {
   }, 1000);
 
   var sel = document.getElementById('filtro-imp');
-  Object.values(IMPULSADORAS).forEach(function(imp){
-    var opt = document.createElement('option');
-    opt.value = imp.nombre;
-    opt.textContent = imp.nombre.split(' ').slice(0,2).join(' ');
-    sel.appendChild(opt);
-  });
-
   document.getElementById('filtro-fecha').value = hoy();
-  cargarImpulsadorasExtra();
-  iniciarTiempoReal();
-  cargarHistorial();
+
+  // Cargar impulsadoras extras PRIMERO, luego poblar todo
+  cargarImpulsadorasExtra().then(function() {
+    Object.values(IMPULSADORAS).forEach(function(imp){
+      var opt = document.createElement('option');
+      opt.value = imp.nombre;
+      opt.textContent = imp.nombre.split(' ').slice(0,2).join(' ');
+      sel.appendChild(opt);
+    });
+    iniciarTiempoReal();
+    cargarHistorial();
+  });
 }
 
 function actualizarFechaAdmin() {
@@ -2275,7 +2298,7 @@ function eliminarImpulsadora(cedula) {
 }
 
 function cargarImpulsadorasExtra() {
-  db.ref('sammy/impulsadoras_extra').get().then(function(snap) {
+  return db.ref('sammy/impulsadoras_extra').get().then(function(snap) {
     if (snap.exists()) {
       Object.entries(snap.val()).forEach(function(entry) {
         IMPULSADORAS[entry[0]] = entry[1];
