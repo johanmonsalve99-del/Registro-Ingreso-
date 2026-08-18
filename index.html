@@ -3018,7 +3018,23 @@ function cargarPresupuestosImp() {
         var _0x23ffe4 = _0x299bc9 >= 100;
         var _0x1a105c = document.createElement("div");
         _0x1a105c.className = "pres-card";
-        _0x1a105c.innerHTML = "<div class=\"pres-tienda\">" + _0x512497.tienda + "</div><div class=\"pres-ciudad\">" + _0x512497.cadena + " · " + _0x512497.ciudad + "" + (document.getElementById("pres-tipo").value === "semanal" ? "semanal" : "mensual") + "</label><div class=\"campo-pesos\"><input type=\"number\" id=\"pres-" + _0x512497.id + "\" value=\"" + (_0x40df39 || "") + "\" placeholder=\"0\" inputmode=\"numeric\" onchange=\"actualizarBarraPreview('" + _0x512497.id + "')\"></div></div><div class=\"campo\" style=\"margin-bottom:8px\"><label>Ventas reales <span style=\"font-weight:400;color:var(--texto-suave)\">(auto: " + formatPesos(_0x970dcb) + " — edítalo si necesitas corregirlo)</span></label><div class=\"campo-pesos\"><input type=\"number\" id=\"ventas-" + _0x512497.id + "\" value=\"" + (_0xventasMostrar || "") + "\" placeholder=\"0\" inputmode=\"numeric\" onchange=\"actualizarBarraPreview('" + _0x512497.id + "')\"></div></div><div style=\"display:flex;justify-content:space-between;align-items:center\"><span style=\"font-size:0.78rem;color:var(--texto-suave)\">Ventas registradas</span><span class=\"pres-porcentaje" + (_0x23ffe4 ? " sobre" : "") + "\" id=\"pct-" + _0x512497.id + "\">" + _0x299bc9 + "%</span></div><div class=\"pres-barra-wrap\"><div class=\"pres-barra" + (_0x23ffe4 ? " sobre" : "") + "\" id=\"barra-" + _0x512497.id + "\" style=\"width:" + Math.min(_0x299bc9, 100) + "%\"></div></div><div class=\"pres-nums\"><span>$0</span><span>" + (_0x40df39 ? formatPesos(_0x40df39) : "Sin presupuesto") + "</span></div>";
+        _0x1a105c.innerHTML =
+          "<div class=\"pres-tienda\">" + _0x512497.tienda + "</div>" +
+          "<div class=\"pres-ciudad\">" + _0x512497.cadena + " · " + _0x512497.ciudad + "</div>" +
+          "<div class=\"campo\" style=\"margin-bottom:8px\">" +
+            "<label>Presupuesto (" + (document.getElementById("pres-tipo").value === "semanal" ? "semanal" : "mensual") + ")</label>" +
+            "<div class=\"campo-pesos\"><input type=\"number\" id=\"pres-" + _0x512497.id + "\" value=\"" + (_0x40df39 || "") + "\" placeholder=\"0\" inputmode=\"numeric\" onchange=\"actualizarBarraPreview('" + _0x512497.id + "')\"></div>" +
+          "</div>" +
+          "<div class=\"campo\" style=\"margin-bottom:8px\">" +
+            "<label>Ventas reales <span style=\"font-weight:400;color:var(--texto-suave)\">(auto: " + formatPesos(_0x970dcb) + " — edítalo si necesitas corregirlo)</span></label>" +
+            "<div class=\"campo-pesos\"><input type=\"number\" id=\"ventas-" + _0x512497.id + "\" value=\"" + (_0xventasMostrar || "") + "\" placeholder=\"0\" inputmode=\"numeric\" onchange=\"actualizarBarraPreview('" + _0x512497.id + "')\"></div>" +
+          "</div>" +
+          "<div style=\"display:flex;justify-content:space-between;align-items:center\">" +
+            "<span style=\"font-size:0.78rem;color:var(--texto-suave)\">Ventas registradas</span>" +
+            "<span class=\"pres-porcentaje" + (_0x23ffe4 ? " sobre" : "") + "\" id=\"pct-" + _0x512497.id + "\">" + _0x299bc9 + "%</span>" +
+          "</div>" +
+          "<div class=\"pres-barra-wrap\"><div class=\"pres-barra" + (_0x23ffe4 ? " sobre" : "") + "\" id=\"barra-" + _0x512497.id + "\" style=\"width:" + Math.min(_0x299bc9, 100) + "%\"></div></div>" +
+          "<div class=\"pres-nums\"><span>$0</span><span>" + (_0x40df39 ? formatPesos(_0x40df39) : "Sin presupuesto") + "</span></div>";
         _0x36cc4e.appendChild(_0x1a105c);
       });
       _0x9491a3.style.display = "";
