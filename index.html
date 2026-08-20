@@ -1170,11 +1170,18 @@ function renderListaImpulsadoras() {
   }).join("");
 }
 
+function _slugPunto(texto) {
+  var mapa = { "á":"a","é":"e","í":"i","ó":"o","ú":"u","ñ":"n","Á":"a","É":"e","Í":"i","Ó":"o","Ú":"u","Ñ":"n" };
+  var normalizado = texto.split("").map(function (c) { return mapa[c] || c; }).join("");
+  return normalizado.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+}
+
 function agregarPunto(prefill) {
   contadorPuntos++;
   var cont = document.getElementById("nuevos-puntos");
   var div = document.createElement("div");
   div.id = "punto-" + contadorPuntos;
+  div.dataset ? (div.dataset.origId = (prefill && prefill.id) || "") : (div.setAttribute("data-orig-id", (prefill && prefill.id) || ""));
   div.style.cssText = "background:var(--crema);border-radius:10px;padding:12px;margin-bottom:10px;position:relative";
   var tienda = (prefill && prefill.tienda) || "";
   var cadena = (prefill && prefill.cadena) || "";
@@ -1251,8 +1258,9 @@ function guardarNuevaImpulsadora() {
     var ciudadInp = document.getElementById("p" + n + "-ciudad");
     var diasInp = document.getElementById("p" + n + "-dias");
     if (tienda && tienda.value.trim()) {
+      var origId = row.dataset ? row.dataset.origId : row.getAttribute("data-orig-id");
       puntos.push({
-        id: tienda.value.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+        id: origId || _slugPunto(tienda.value.trim()),
         tienda: tienda.value.trim().toUpperCase(),
         cadena: cadenaSel ? cadenaSel.value : "",
         ciudad: ciudadInp ? ciudadInp.value.trim().toUpperCase() : ciudad,
@@ -1265,6 +1273,8 @@ function guardarNuevaImpulsadora() {
 
   db.ref("sammy/impulsadoras_extra/" + cedula).set(datos).then(function () {
     IMPULSADORAS[cedula] = datos;
+    // Si estaba en la lista de eliminadas (por ejemplo, se está re-agregando), la quitamos de ahí
+    db.ref("sammy/impulsadoras_eliminadas/" + cedula).remove().catch(function () {});
     mostrarToast(esEdicion ? "✓ " + nombre + " actualizada" : "✓ " + nombre + " agregada", "exito");
     cancelarEdicionImpulsadora();
     renderListaImpulsadoras();
@@ -1277,11 +1287,37 @@ function eliminarImpulsadora(cedula) {
   var data = IMPULSADORAS[cedula];
   if (!data) return;
   if (!confirm("¿Eliminar a " + data.nombre + "?")) return;
-  db.ref("sammy/impulsadoras_extra/" + cedula).remove().catch(function () {});
-  delete IMPULSADORAS[cedula];
-  if (impulsadoraEditando === cedula) cancelarEdicionImpulsadora();
-  mostrarToast("Impulsadora eliminada", "");
-  renderListaImpulsadoras();
+  // Marcamos como eliminada (tumba) porque muchas impulsadoras vienen precargadas en el
+  // código fuente de la app y no basta con borrar su registro "extra" en Firebase:
+  // reaparecerían al recargar si no quedan marcadas como eliminadas.
+  Promise.all([
+    db.ref("sammy/impulsadoras_eliminadas/" + cedula).set(true),
+    db.ref("sammy/impulsadoras_extra/" + cedula).remove()
+  ]).then(function () {
+    delete IMPULSADORAS[cedula];
+    if (impulsadoraEditando === cedula) cancelarEdicionImpulsadora();
+    mostrarToast("Impulsadora eliminada", "");
+    renderListaImpulsadoras();
+  }).catch(function (err) {
+    mostrarToast("Error: " + err.message, "error");
+  });
+}
+
+function cargarImpulsadorasExtra() {
+  return db.ref("sammy/impulsadoras_extra").get().then(function (snap) {
+    if (snap.exists()) {
+      Object.entries(snap.val()).forEach(function (par) {
+        IMPULSADORAS[par[0]] = par[1];
+      });
+    }
+    return db.ref("sammy/impulsadoras_eliminadas").get().then(function (snapDel) {
+      if (snapDel.exists()) {
+        Object.keys(snapDel.val()).forEach(function (cedula) {
+          delete IMPULSADORAS[cedula];
+        });
+      }
+    });
+  }).catch(function () {});
 }
 
 /* ===== PRESUPUESTO: ventas reales editables por la administradora ===== */
