@@ -1433,6 +1433,43 @@ function guardarPresupuestos() {
   });
 }
 
+/* ===== LOGIN IMPULSADORA: siempre revisa Firebase, no solo la copia local ===== */
+
+function loginImpulsadora() {
+  var cedula = document.getElementById("cedula-input").value.trim();
+  var errorEl = document.getElementById("error-login");
+  errorEl.classList.remove("visible");
+
+  if (!cedula) return;
+
+  // Siempre consultamos Firebase primero, así reflejamos ediciones del admin
+  // aunque la impulsadora ya venga precargada en el código de la app.
+  db.ref("sammy/impulsadoras_extra/" + cedula).get().then(function (snap) {
+    if (snap.exists()) {
+      var datos = snap.val();
+      IMPULSADORAS[cedula] = datos; // sincroniza con lo más reciente
+      usuarioActual = Object.assign({ cedula: cedula }, datos);
+      mostrarPantallaImpulsadora();
+      return;
+    }
+    // No hay override en Firebase: usamos la copia local (precargada) si existe
+    if (IMPULSADORAS[cedula]) {
+      usuarioActual = Object.assign({ cedula: cedula }, IMPULSADORAS[cedula]);
+      mostrarPantallaImpulsadora();
+      return;
+    }
+    errorEl.classList.add("visible");
+  }).catch(function () {
+    // Si falla la consulta a Firebase, al menos probamos con la copia local
+    if (IMPULSADORAS[cedula]) {
+      usuarioActual = Object.assign({ cedula: cedula }, IMPULSADORAS[cedula]);
+      mostrarPantallaImpulsadora();
+    } else {
+      errorEl.classList.add("visible");
+    }
+  });
+}
+
 function cargarWidgetPresupuesto(contenedor, punto) {
   var hoy = new Date();
   var periodo = hoy.getFullYear() + "-" + String(hoy.getMonth() + 1).padStart(2, "0");
